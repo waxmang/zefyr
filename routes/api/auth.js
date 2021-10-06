@@ -11,7 +11,7 @@ const router = express.Router();
 
 // @route   GET api/auth
 // @desc    Test route
-// @access  Public
+// @access  Private
 router.get('/', jwtAuth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
