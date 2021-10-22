@@ -1,7 +1,8 @@
 /* Global Styles */
 :root {
-  --primary-color: #17a2b8;
-  --dark-color: #343a40;
+  --primary-color: #d4a373;
+  --secondary-color: #558b70;
+  --dark-color: #182b32;
   --light-color: #f4f4f4;
   --danger-color: #dc3545;
   --success-color: #28a745;
@@ -17,7 +18,7 @@ body {
   font-family: 'Raleway', sans-serif;
   font-size: 1rem;
   line-height: 1.6;
-  background-color: #fff;
+  background-color: #fefff6;
   color: #333;
 }
 
@@ -32,6 +33,30 @@ ul {
 
 img {
   width: 100%;
+}
+
+input {
+  border: 0;
+  padding: 4px;
+  background-color: var(--dark-color);
+  color: #ccd5ae;
+  border-radius: 4px;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+input:focus {
+  outline: none !important;
 }
 
 .map-container {
@@ -88,7 +113,7 @@ img {
 }
 
 .text-dark {
-  color: var(--dark-color);
+  color: var(--secondary-color);
 }
 
 /* Padding */
@@ -193,7 +218,7 @@ img {
 .bg-dark,
 .badge-dark,
 .alert-dark {
-  background: var(--dark-color);
+  background: var(--secondary-color);
   color: #fff;
 }
 
@@ -407,7 +432,7 @@ button {
 }
 
 .profile-top .icons a:hover {
-  color: var(--dark-color);
+  color: var(--secondary-color);
 }
 
 .profile-about {

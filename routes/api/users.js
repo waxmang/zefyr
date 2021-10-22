@@ -1,11 +1,11 @@
 const bcrypt = require('bcryptjs');
 const express = require('express');
-const gravatar = require('gravatar');
 const jwt = require('jsonwebtoken');
 const { check, validationResult } = require('express-validator');
 
 const config = require('config');
 const User = require('../../models/User');
+const Garage = require('../../models/Garage');
 
 const router = express.Router();
 
@@ -38,17 +38,9 @@ router.post(
           .json({ errors: [{ msg: 'User already exists' }] });
       }
 
-      // Get user's gravatar
-      const avatar = gravatar.url(email, {
-        s: '200',
-        r: 'pg',
-        d: 'mm',
-      });
-
       user = new User({
         name,
         email,
-        avatar,
         password,
       });
 
@@ -73,6 +65,15 @@ router.post(
           res.json({ token });
         }
       );
+
+      // Create new empty Garage when user registers
+      const garage = new Garage({
+        user: user.id,
+        categories: [],
+        sharedUsers: [user.id],
+      });
+
+      await garage.save();
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server error');

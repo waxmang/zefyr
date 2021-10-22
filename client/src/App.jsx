@@ -8,7 +8,9 @@ import Register from './components/auth/Register';
 import Login from './components/auth/Login';
 import Alert from './components/layout/Alert';
 import Dashboard from './components/dashboard/Dashboard';
+import Garage from './components/garage/Garage';
 import PrivateRoute from './components/routing/PrivateRoute';
+import 'sanitize.css';
 import './App.css';
 
 // Redux
@@ -36,24 +38,24 @@ const App = () => {
     store.dispatch(loadUser());
   }, []);
 
-  useEffect(() => {
-    if (map.current) return;
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/outdoors-v11',
-      center: [lng, lat],
-      zoom: zoom,
-    });
-  });
+  // useEffect(() => {
+  //   if (map.current) return;
+  //   map.current = new mapboxgl.Map({
+  //     container: mapContainer.current,
+  //     style: 'mapbox://styles/mapbox/outdoors-v11',
+  //     center: [lng, lat],
+  //     zoom: zoom,
+  //   });
+  // });
 
-  useEffect(() => {
-    if (!map.current) return;
-    map.current.on('move', () => {
-      setLng(map.current.getCenter().lng.toFixed(4));
-      setLat(map.current.getCenter().lat.toFixed(4));
-      setZoom(map.current.getZoom().toFixed(2));
-    });
-  });
+  // useEffect(() => {
+  //   if (!map.current) return;
+  //   map.current.on('move', () => {
+  //     setLng(map.current.getCenter().lng.toFixed(4));
+  //     setLat(map.current.getCenter().lat.toFixed(4));
+  //     setZoom(map.current.getZoom().toFixed(2));
+  //   });
+  // });
 
   return (
     <Provider store={store}>
@@ -67,13 +69,14 @@ const App = () => {
               <Route exact path="/register" component={Register} />
               <Route exact path="/login" component={Login} />
               <PrivateRoute exact path="/dashboard" component={Dashboard} />
+              <PrivateRoute exact path="/closet" component={Garage} />
             </Switch>
           </section>
           <div>
-            <div className="sidebar">
+            {/* <div className="sidebar">
               Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-            </div>
-            <div ref={mapContainer} className="map-container" />
+            </div> */}
+            {/* <div ref={mapContainer} className="map-container" /> */}
           </div>
         </Fragment>
       </Router>

@@ -10,7 +10,7 @@ const User = require('../../models/User');
 const router = express.Router();
 
 // @route   GET api/auth
-// @desc    Test route
+// @desc    Get current user
 // @access  Private
 router.get('/', jwtAuth, async (req, res) => {
   try {
