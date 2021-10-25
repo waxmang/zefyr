@@ -20,7 +20,7 @@ const ItemSchema = new mongoose.Schema({
   },
   weight: {
     type: Number,
-    default: undefined,
+    default: 0,
   },
   unit: {
     type: String,

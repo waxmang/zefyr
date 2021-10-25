@@ -40,9 +40,11 @@ const Item = ({ item, index }) => {
   };
 
   const onSelect = (e) => {
+    const newItem = { ...item };
+    newItem.unit = e.value;
     dispatch({
       type: EDIT_ITEM,
-      payload: { id: _id, key: 'unit', value: e.value },
+      payload: { item: newItem },
     });
   };
 

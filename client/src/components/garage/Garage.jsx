@@ -37,7 +37,6 @@ const Garage = ({
   }, [getCurrentUserCategories, getCurrentGarage]);
 
   const onDragEnd = (result) => {
-    console.log(result);
     const { destination, source, draggableId } = result;
 
     if (!destination) {

@@ -8,11 +8,29 @@ import {
   faRoute,
   faWarehouse,
   faSignOutAlt,
+  faMap,
 } from '@fortawesome/free-solid-svg-icons';
+import styled from 'styled-components';
+
+const LandingContainer = styled.div`
+  height: 100%;
+  width: 240px;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  overflow-x: hidden;
+  background-color: #558b70;
+`;
 
 const Navbar = ({ auth: { isAuthenticated, loading }, logout }) => {
   const authLinks = (
     <ul>
+      <li>
+        <Link to="/map">
+          <FontAwesomeIcon icon={faMap} /> <span className="hide-sm">Map</span>
+        </Link>
+      </li>
       <li>
         <Link to="/closet">
           <FontAwesomeIcon icon={faWarehouse} />{' '}
@@ -43,16 +61,18 @@ const Navbar = ({ auth: { isAuthenticated, loading }, logout }) => {
   );
 
   return (
-    <nav className="navbar bg-dark">
-      <h1>
-        <Link to="/">
-          <FontAwesomeIcon icon={faRoute} /> Zephyr
-        </Link>
-      </h1>
-      {!loading && (
-        <Fragment>{isAuthenticated ? authLinks : guestLinks}</Fragment>
-      )}
-    </nav>
+    <LandingContainer>
+      <nav>
+        <h1>
+          <Link to="/">
+            <FontAwesomeIcon icon={faRoute} /> Zephyr
+          </Link>
+        </h1>
+        {!loading && (
+          <Fragment>{isAuthenticated ? authLinks : guestLinks}</Fragment>
+        )}
+      </nav>
+    </LandingContainer>
   );
 };
 

@@ -62,7 +62,10 @@ export default function profile(state = initialState, action) {
       );
 
       const newItems = [...category.items];
-      newItems.splice(newItems.indexOf(payload.item), 1, payload.item);
+      const index = newItems.indexOf(
+        newItems.find((item) => item._id === payload.item._id)
+      );
+      newItems.splice(index, 1, payload.item);
 
       const newCategory = { ...category, items: newItems };
       const newCategories = [...state.categories];
@@ -86,10 +89,8 @@ export default function profile(state = initialState, action) {
     }
     case EDIT_CATEGORY: {
       const newCategories = [...state.categories];
-      const index = state.categories.indexOf(
-        state.categories.find(
-          (category) => category._id === payload.category._id
-        )
+      const index = newCategories.indexOf(
+        newCategories.find((category) => category._id === payload.category._id)
       );
 
       newCategories.splice(index, 1, payload.category);
@@ -109,7 +110,7 @@ export default function profile(state = initialState, action) {
       return { ...state, categories: newCategories };
     }
     case EDIT_CATEGORIES:
-      return { ...state, categories: payload.newCategories };
+      return { ...state, categories: payload.categories };
     default:
       return state;
   }
