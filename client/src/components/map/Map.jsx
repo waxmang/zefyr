@@ -5,6 +5,7 @@ import { faRoute } from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components';
 import mapboxgl from 'mapbox-gl';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
+import doubleClickZoom from '@mapbox/mapbox-gl-draw/src/lib/double_click_zoom';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import filterObject from '../../utils/filterObject';
 
@@ -36,19 +37,20 @@ const MapContainer = styled.div`
 mapboxgl.accessToken =
   'pk.eyJ1IjoibWF4d2FuZzA1MSIsImEiOiJja3J3a3g4Z24waG03MnZtaWthZGUwbzdvIn0.zHmuo1QvKneRY5nJy2TgAQ';
 
-var LotsOfPointsMode = {};
+var DrawRoute = {};
 
 // When the mode starts this function will be called.
 // The `opts` argument comes from `draw.changeMode('lotsofpoints', {count:7})`.
 // The value returned should be an object and will be passed to all other lifecycle functions
-LotsOfPointsMode.onSetup = function (opts) {
+DrawRoute.onSetup = function (opts) {
   var state = {};
   state.count = opts.count || 0;
+  doubleClickZoom.disable(this);
   return state;
 };
 
 // Whenever a user clicks on the map, Draw will call `onClick`
-LotsOfPointsMode.onClick = async function (state, e) {
+DrawRoute.onClick = function (state, e) {
   // `this.newFeature` takes geojson and makes a DrawFeature
 
   var point = this.newFeature({
@@ -69,7 +71,6 @@ LotsOfPointsMode.onClick = async function (state, e) {
       features,
       (feature) => feature.type === 'Point'
     );
-    console.log(pointFeatures);
     const lastPointId = Object.keys(pointFeatures)[
       Object.keys(pointFeatures).length - 1
     ];
@@ -77,33 +78,37 @@ LotsOfPointsMode.onClick = async function (state, e) {
 
     const coordinates = `${lastPoint.coordinates[0]},${lastPoint.coordinates[1]};${point.coordinates[0]},${point.coordinates[1]}`;
 
-    const lineCoordinates = await getMatch(coordinates, [25, 25], 'walking');
-
-    // Add new line feature to object here using coords
-    const line = this.newFeature({
-      type: 'Feature',
-      properties: {},
-      geometry: {
-        type: 'LineString',
-        coordinates: lineCoordinates,
-      },
+    getMatch(coordinates, [25, 25], 'walking').then((lineCoordinates) => {
+      // Add new line feature to object here using coords
+      const line = this.newFeature({
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'LineString',
+          coordinates: lineCoordinates,
+        },
+      });
+      this.addFeature(line);
+      this.addFeature(point); // puts the point on the map
     });
-    this.addFeature(line);
+  } else {
+    this.addFeature(point);
   }
-
-  this.addFeature(point); // puts the point on the map
 };
 
 // Whenever a user clicks on a key while focused on the map, it will be sent here
-LotsOfPointsMode.onKeyUp = function (state, e) {
-  if (e.keyCode === 27) return this.changeMode('simple_select');
+DrawRoute.onStop = function (state) {
+  doubleClickZoom.enable(this);
+  console.log('Stopped drawing route');
 };
 
 // This is the only required function for a mode.
 // It decides which features currently in Draw's data store will be rendered on the map.
 // All features passed to `display` will be rendered, so you can pass multiple display features per internal feature.
 // See `styling-draw` in `API.md` for advice on making display features
-LotsOfPointsMode.toDisplayFeatures = function (state, geojson, display) {
+DrawRoute.toDisplayFeatures = function (state, geojson, display) {
+  console.log(this);
+  console.log(geojson);
   display(geojson);
 };
 
@@ -122,9 +127,8 @@ const getMatch = async (coordinates, radius, profile) => {
     return;
   }
   // Get the coordinates from the response
-  const coords = await response.matchings[0].geometry.coordinates;
+  const coords = response.matchings[0].geometry.coordinates;
   // Code from the next step will go here
-  console.log(coords);
   return coords;
 };
 
@@ -181,7 +185,7 @@ const draw = new MapboxDraw({
   defaultMode: 'lots_of_points',
   modes: Object.assign(
     {
-      lots_of_points: LotsOfPointsMode,
+      lots_of_points: DrawRoute,
     },
     MapboxDraw.modes
   ),
@@ -252,7 +256,6 @@ const Map = () => {
     if (response.code !== 'Ok') {
       return;
     }
-    console.log(response);
     // Get the coordinates from the response
     const coords = response.matchings[0].geometry;
     // Code from the next step will go here
@@ -309,9 +312,6 @@ const Map = () => {
   return (
     <MapComponentContainer>
       <div>
-        <div className="sidebar">
-          Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-        </div>
         {/* <MapControlsContainer>
           <Button onClick={onClickAddRoute}>
             <FontAwesomeIcon icon={faRoute} />
