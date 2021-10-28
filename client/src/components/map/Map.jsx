@@ -89,11 +89,12 @@ DrawRoute.onClick = function (state, e) {
         },
       });
       this.addFeature(line);
-      this.addFeature(point); // puts the point on the map
+
+      this._ctx.store.render();
+      // this.addFeature(point); // puts the point on the map
     });
-  } else {
-    this.addFeature(point);
   }
+  this.addFeature(point);
 };
 
 // Whenever a user clicks on a key while focused on the map, it will be sent here
@@ -107,8 +108,6 @@ DrawRoute.onStop = function (state) {
 // All features passed to `display` will be rendered, so you can pass multiple display features per internal feature.
 // See `styling-draw` in `API.md` for advice on making display features
 DrawRoute.toDisplayFeatures = function (state, geojson, display) {
-  console.log(this);
-  console.log(geojson);
   display(geojson);
 };
 
