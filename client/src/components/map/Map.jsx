@@ -8,6 +8,7 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import doubleClickZoom from '@mapbox/mapbox-gl-draw/src/lib/double_click_zoom';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import filterObject from '../../utils/filterObject';
+import extendDrawBar from '../../utils/extendDrawBar';
 
 const MapComponentContainer = styled.div`
   margin: 0;
@@ -181,13 +182,28 @@ const draw = new MapboxDraw({
       },
     },
   ],
-  defaultMode: 'lots_of_points',
+  // defaultMode: 'draw_route',
   modes: Object.assign(
     {
-      lots_of_points: DrawRoute,
+      draw_route: DrawRoute,
     },
     MapboxDraw.modes
   ),
+});
+
+const enableDrawRouteMode = () => {
+  draw.changeMode('draw_route');
+};
+const drawBar = new extendDrawBar({
+  draw: draw,
+  buttons: [
+    {
+      on: 'click',
+      action: enableDrawRouteMode,
+      classes: [],
+      content: '<span><i class="fas fa-route"></i></span>',
+    },
+  ],
 });
 
 const Map = () => {
@@ -210,7 +226,7 @@ const Map = () => {
       map.current.resize();
     });
 
-    map.current.addControl(draw);
+    map.current.addControl(drawBar);
   });
 
   useEffect(() => {
@@ -318,6 +334,7 @@ const Map = () => {
         </MapControlsContainer> */}
         <MapContainer ref={mapContainer} />
         <div id="calculated-line"></div>
+        <div></div>
       </div>
     </MapComponentContainer>
   );
