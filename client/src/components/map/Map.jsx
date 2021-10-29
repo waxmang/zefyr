@@ -44,7 +44,11 @@ var DrawRoute = {};
 // The `opts` argument comes from `draw.changeMode('lotsofpoints', {count:7})`.
 // The value returned should be an object and will be passed to all other lifecycle functions
 DrawRoute.onSetup = function (opts) {
-  var state = {};
+  console.log(opts);
+  var state = {
+    points: [],
+    lines: [],
+  };
   state.count = opts.count || 0;
   doubleClickZoom.disable(this);
   return state;
@@ -67,7 +71,7 @@ DrawRoute.onClick = function (state, e) {
 
   const features = this._ctx.store._features;
 
-  if (Object.keys(features).length > 0) {
+  if (state.points.length > 0) {
     const pointFeatures = filterObject(
       features,
       (feature) => feature.type === 'Point'
@@ -75,26 +79,41 @@ DrawRoute.onClick = function (state, e) {
     const lastPointId = Object.keys(pointFeatures)[
       Object.keys(pointFeatures).length - 1
     ];
-    const lastPoint = features[lastPointId];
+    const lastPoint = state.points[state.points.length - 1];
+    console.log(lastPoint);
 
     const coordinates = `${lastPoint.coordinates[0]},${lastPoint.coordinates[1]};${point.coordinates[0]},${point.coordinates[1]}`;
 
-    getMatch(coordinates, [25, 25], 'walking').then((lineCoordinates) => {
-      // Add new line feature to object here using coords
-      const line = this.newFeature({
-        type: 'Feature',
-        properties: {},
-        geometry: {
-          type: 'LineString',
-          coordinates: lineCoordinates,
-        },
-      });
-      this.addFeature(line);
+    getMatch(coordinates, [35, 35], 'walking').then((lineCoordinates) => {
+      let line = null;
+      if (!lineCoordinates) {
+        console.log('No coordinates to get here');
 
+        line = this.newFeature({
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates: [lastPoint.coordinates, point.coordinates],
+          },
+        });
+      } else {
+        // Add new line feature to object here using coords
+        line = this.newFeature({
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates: lineCoordinates,
+          },
+        });
+      }
+      this.addFeature(line);
       this._ctx.store.render();
-      // this.addFeature(point); // puts the point on the map
+      console.log(this._ctx.store._features);
     });
   }
+  state.points.push(point);
   this.addFeature(point);
 };
 
@@ -122,6 +141,7 @@ const getMatch = async (coordinates, radius, profile) => {
     { method: 'GET' }
   );
   const response = await query.json();
+  console.log(response);
   // Handle errors
   if (response.code !== 'Ok') {
     return;
@@ -236,9 +256,6 @@ const Map = () => {
       setLat(map.current.getCenter().lat.toFixed(4));
       setZoom(map.current.getZoom().toFixed(2));
     });
-
-    map.current.on('draw.create', updateRoute);
-    map.current.on('draw.update', updateRoute);
   });
 
   // Use the coordinates you drew to make the Map Matching API request
