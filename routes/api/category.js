@@ -2,7 +2,7 @@ const express = require('express');
 const { check, validationResult } = require('express-validator');
 
 const config = require('config');
-const Garage = require('../../models/Garage');
+const Closet = require('../../models/Closet');
 const Item = require('../../models/Item');
 const Category = require('../../models/Category');
 const jwtAuth = require('../../middleware/jwtAuth');
@@ -10,15 +10,15 @@ const jwtAuth = require('../../middleware/jwtAuth');
 const router = express.Router();
 
 // @route   POST api/category
-// @desc    Add category to current user's garage
+// @desc    Add category to current user's closet
 // @access  Private
 router.post('/', jwtAuth, async (req, res) => {
   try {
-    let garage = await Garage.findOne({ user: req.user.id });
+    let closet = await Closet.findOne({ user: req.user.id });
 
-    if (garage) {
+    if (closet) {
       const categoryFields = {
-        garage: garage.id,
+        closet: closet.id,
         items: [],
         name: req.body.name,
       };
@@ -26,9 +26,9 @@ router.post('/', jwtAuth, async (req, res) => {
       const newCategory = new Category(categoryFields);
 
       const category = await newCategory.save();
-      const newCategories = [...garage.categories, category.id];
+      const newCategories = [...closet.categories, category.id];
 
-      await Garage.findByIdAndUpdate(garage.id, {
+      await Closet.findByIdAndUpdate(closet.id, {
         $set: { categories: newCategories },
       });
 
@@ -67,8 +67,8 @@ router.put('/:categoryId', jwtAuth, async (req, res) => {
 
 router.get('/', jwtAuth, async (req, res) => {
   try {
-    const garage = await Garage.findOne({ user: req.user.id });
-    const categoryIds = garage.categories;
+    const closet = await Closet.findOne({ user: req.user.id });
+    const categoryIds = closet.categories;
 
     const categories = await Category.find({ _id: categoryIds }).populate({
       path: 'items',
@@ -93,23 +93,23 @@ router.delete('/:categoryId', jwtAuth, async (req, res) => {
 
   try {
     const category = await Category.findById(categoryId);
-    const garage = await Garage.findOne({ user: req.user.id });
+    const closet = await Closet.findOne({ user: req.user.id });
 
     if (!category) {
       return res.status(404).json({ msg: 'Category not found' });
     }
 
     // Check user
-    if (category.garage.toString() !== garage.id) {
+    if (category.closet.toString() !== closet.id) {
       return res.status(401).json({ msg: 'User not authorized' });
     }
 
     await category.remove();
 
-    // Remove category from garage
-    const newCategories = [...garage.categories];
+    // Remove category from closet
+    const newCategories = [...closet.categories];
     newCategories.splice(newCategories.indexOf(categoryId), 1);
-    await Garage.findByIdAndUpdate(garage.id, { categories: newCategories });
+    await Closet.findByIdAndUpdate(closet.id, { categories: newCategories });
 
     res.json({ msg: 'Category removed' });
   } catch (err) {

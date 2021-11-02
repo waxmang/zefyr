@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const ItemSchema = new mongoose.Schema({
-  garage: {
+  closet: {
     type: Schema.Types.ObjectId,
-    ref: 'garages',
+    ref: 'closets',
   },
   name: {
     type: String,

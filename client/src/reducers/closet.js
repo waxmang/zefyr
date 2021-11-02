@@ -1,7 +1,7 @@
 import {
-  GET_GARAGE,
-  GARAGE_ERROR,
-  CLEAR_GARAGE,
+  GET_CLOSET,
+  CLOSET_ERROR,
+  CLEAR_CLOSET,
   GET_ITEMS,
   ITEMS_ERROR,
   CLEAR_ITEMS,
@@ -15,7 +15,7 @@ import {
 } from '../actions/types';
 
 const initialState = {
-  garage: null,
+  closet: null,
   categories: null,
   loading: true,
   error: {},
@@ -25,10 +25,10 @@ export default function profile(state = initialState, action) {
   const { type, payload } = action;
 
   switch (type) {
-    case GET_GARAGE:
+    case GET_CLOSET:
       return {
         ...state,
-        garage: payload,
+        closet: payload,
         loading: false,
       };
     case GET_CATEGORIES:
@@ -37,17 +37,17 @@ export default function profile(state = initialState, action) {
         categories: payload,
         loading: false,
       };
-    case GARAGE_ERROR:
+    case CLOSET_ERROR:
     case CATEGORIES_ERROR:
       return {
         ...state,
         error: payload,
         loading: false,
       };
-    case CLEAR_GARAGE:
+    case CLEAR_CLOSET:
       return {
         ...state,
-        garage: null,
+        closet: null,
         loading: false,
       };
     case CLEAR_ITEMS:

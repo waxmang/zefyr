@@ -8,7 +8,7 @@ import {
   LOGIN_SUCCESS,
   LOGIN_FAIL,
   LOGOUT,
-  CLEAR_GARAGE,
+  CLEAR_CLOSET,
   CLEAR_ITEMS,
 } from './types';
 import { setAlert } from './alert';
@@ -100,7 +100,7 @@ export const login = ({ email, password }) => async (dispatch) => {
 
 // Logout / Clear profile
 export const logout = () => (dispatch) => {
-  dispatch({ type: CLEAR_GARAGE });
+  dispatch({ type: CLEAR_CLOSET });
   dispatch({ type: CLEAR_ITEMS });
   dispatch({ type: LOGOUT });
 };

@@ -10,11 +10,11 @@ import Button from 'react-bootstrap/Button';
 
 import Spinner from '../layout/Spinner';
 import {
-  getCurrentGarage,
+  getCurrentCloset,
   getCurrentUserCategories,
-} from '../../actions/garage';
+} from '../../actions/closet';
 import Items from './Items';
-import './Garage.css';
+import './Closet.css';
 import { EDIT_CATEGORIES, EDIT_CATEGORY } from '../../actions/types';
 import Category from './Category';
 
@@ -23,18 +23,18 @@ const CategoriesContainer = styled.div`
     props.isDraggingOver ? 'skyblue' : 'transparent'};
 `;
 
-const Garage = ({
+const Closet = ({
   getCurrentUserCategories,
-  getCurrentGarage,
+  getCurrentCloset,
   auth,
-  garage: { loading, garage, categories },
+  closet: { loading, closet, categories },
 }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
     getCurrentUserCategories();
-    getCurrentGarage();
-  }, [getCurrentUserCategories, getCurrentGarage]);
+    getCurrentCloset();
+  }, [getCurrentUserCategories, getCurrentCloset]);
 
   const onDragEnd = (result) => {
     const { destination, source, draggableId } = result;
@@ -66,7 +66,7 @@ const Garage = ({
         type: EDIT_CATEGORIES,
         payload: { categories: newCategories },
       });
-      axios.put('/api/garage', { categories: newCategoryIds });
+      axios.put('/api/closet', { categories: newCategoryIds });
     } else if (result.type === 'items') {
       const sourceCategoryId = result.source.droppableId.split('-')[0];
       const sourceCategory = categories.find(
@@ -118,9 +118,9 @@ const Garage = ({
   };
 
   const onAddCategory = async () => {
-    await axios.post('/api/category', { garage: garage._id });
+    await axios.post('/api/category', { closet: closet._id });
     getCurrentUserCategories();
-    getCurrentGarage();
+    getCurrentCloset();
   };
 
   const onAddItem = async (categoryId) => {
@@ -128,12 +128,12 @@ const Garage = ({
     getCurrentUserCategories();
   };
 
-  return loading && (garage === null || categories === null) ? (
+  return loading && (closet === null || categories === null) ? (
     <Spinner />
   ) : (
     <DragDropContext onDragEnd={onDragEnd}>
       <h1 className="large text-primary">Closet</h1>
-      <div className="top-garage-controls"></div>
+      <div className="top-closet-controls"></div>
 
       {/* Droppable container for all the categories */}
       {categories !== null && (
@@ -183,7 +183,7 @@ const Garage = ({
           </Droppable>
         </div>
       )}
-      <div className="bottom-garage-controls">
+      <div className="bottom-closet-controls">
         <Button variant="primary" onClick={onAddCategory}>
           + Add Category
         </Button>
@@ -192,19 +192,19 @@ const Garage = ({
   );
 };
 
-Garage.propTypes = {
+Closet.propTypes = {
   getCurrentUserCategories: PropTypes.func.isRequired,
-  getCurrentGarage: PropTypes.func.isRequired,
+  getCurrentCloset: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
-  garage: PropTypes.object.isRequired,
+  closet: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   auth: state.auth,
-  garage: state.garage,
+  closet: state.closet,
 });
 
 export default connect(mapStateToProps, {
   getCurrentUserCategories,
-  getCurrentGarage,
-})(Garage);
+  getCurrentCloset,
+})(Closet);

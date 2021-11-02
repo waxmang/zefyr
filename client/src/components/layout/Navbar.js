@@ -27,8 +27,9 @@ const Navbar = ({ auth: { isAuthenticated, loading }, logout }) => {
   const authLinks = (
     <ul>
       <li>
-        <Link to="/map">
-          <FontAwesomeIcon icon={faMap} /> <span className="hide-sm">Map</span>
+        <Link to="/trips">
+          <FontAwesomeIcon icon={faMap} />{' '}
+          <span className="hide-sm">Trips</span>
         </Link>
       </li>
       <li>

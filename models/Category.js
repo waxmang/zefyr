@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const CategorySchema = new mongoose.Schema({
-  garage: {
+  closet: {
     type: Schema.Types.ObjectId,
-    ref: 'garages',
+    ref: 'closets',
   },
   items: [{ type: Schema.Types.ObjectId, ref: 'items' }],
   name: {

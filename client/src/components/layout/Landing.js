@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 const Landing = ({ isAuthenticated }) => {
   if (isAuthenticated) {
-    return <Redirect to="/dashboard" />;
+    return <Redirect to="/trips" />;
   }
 
   return (

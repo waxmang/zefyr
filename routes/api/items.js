@@ -2,7 +2,7 @@ const express = require('express');
 const { check, validationResult } = require('express-validator');
 
 const config = require('config');
-const Garage = require('../../models/Garage');
+const Closet = require('../../models/Closet');
 const Item = require('../../models/Item');
 const jwtAuth = require('../../middleware/jwtAuth');
 const Category = require('../../models/Category');
@@ -10,18 +10,18 @@ const Category = require('../../models/Category');
 const router = express.Router();
 
 // @route   POST api/items
-// @desc    Add item to current user's garage
+// @desc    Add item to current user's closet
 // @access  Private
 router.post('/', jwtAuth, async (req, res) => {
   try {
-    let garage = await Garage.findOne({ user: req.user.id });
+    let closet = await Closet.findOne({ user: req.user.id });
     // TODO: Add validation for category to make sure there is a value present and
     // the category exists
     let category = await Category.findById(req.body.category);
 
-    if (garage) {
+    if (closet) {
       const itemFields = {
-        garage: garage.id,
+        closet: closet.id,
         name: req.body.name,
         description: req.body.description,
         category: req.body.category,
@@ -34,7 +34,7 @@ router.post('/', jwtAuth, async (req, res) => {
         (k) => !itemFields[k] && delete itemFields[k]
       );
 
-      // Create a new item associated with the garage ID
+      // Create a new item associated with the closet ID
       const newItem = new Item(itemFields);
 
       const item = await newItem.save();
@@ -53,7 +53,7 @@ router.post('/', jwtAuth, async (req, res) => {
 });
 
 // @route   PUT api/items
-// @desc    Modify item in user's garage
+// @desc    Modify item in user's closet
 // @access  Private
 router.put('/:itemId', jwtAuth, async (req, res) => {
   const { itemId } = req.params;
@@ -84,13 +84,13 @@ router.put('/:itemId', jwtAuth, async (req, res) => {
 });
 
 // @route   GET api/items
-// @desc    Get all user's items in their garage
+// @desc    Get all user's items in their closet
 // @access  Private
 router.get('/', jwtAuth, async (req, res) => {
   try {
-    const garage = await Garage.findOne({ user: req.user.id });
+    const closet = await Closet.findOne({ user: req.user.id });
 
-    const items = await Item.find({ garage: garage.id });
+    const items = await Item.find({ closet: closet.id });
 
     res.json(items);
   } catch (err) {
@@ -104,14 +104,14 @@ router.delete('/:itemId', jwtAuth, async (req, res) => {
 
   try {
     const item = await Item.findById(itemId);
-    const garage = await Garage.findOne({ user: req.user.id });
+    const closet = await Closet.findOne({ user: req.user.id });
 
     if (!item) {
       return res.status(404).json({ msg: 'Item not found' });
     }
 
     // Check user
-    if (item.garage.toString() !== garage.id) {
+    if (item.closet.toString() !== closet.id) {
       return res.status(401).json({ msg: 'User not authorized' });
     }
 

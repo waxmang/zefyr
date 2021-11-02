@@ -1,27 +1,27 @@
 const express = require('express');
 
 const config = require('config');
-const Garage = require('../../models/Garage');
+const Closet = require('../../models/Closet');
 const jwtAuth = require('../../middleware/jwtAuth');
 
 const router = express.Router();
 
-// @route   POST api/garage
-// @desc    Update garage
+// @route   POST api/closet
+// @desc    Update closet
 // @access  Private
 router.post('/', jwtAuth, async (req, res) => {
   try {
-    let garage = await Garage.findOne({ user: req.user.id });
+    let closet = await Closet.findOne({ user: req.user.id });
 
-    if (garage) {
-      garage = await Garage.findOneAndUpdate(
+    if (closet) {
+      closet = await Closet.findOneAndUpdate(
         { user: req.user.id },
         // { $set: { categories: req.body.categories } },
         { new: true }
       );
     }
 
-    res.json(garage);
+    res.json(closet);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
@@ -30,38 +30,38 @@ router.post('/', jwtAuth, async (req, res) => {
 
 router.put('/', jwtAuth, async (req, res) => {
   try {
-    const garageFields = {
+    const closetFields = {
       categories: req.body.categories,
       sharedUsers: req.body.sharedUsers,
     };
 
     // Remove null values from itemFields
-    Object.keys(garageFields).forEach(
-      (k) => !garageFields[k] && delete garageFields[k]
+    Object.keys(closetFields).forEach(
+      (k) => !closetFields[k] && delete closetFields[k]
     );
 
-    const garage = await Garage.findOneAndUpdate(
+    const closet = await Closet.findOneAndUpdate(
       { user: req.user.id },
       {
-        $set: garageFields,
+        $set: closetFields,
       }
     );
 
-    res.json(garage);
+    res.json(closet);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
   }
 });
 
-// @route   GET api/garage
-// @desc    Get a user's garage
+// @route   GET api/closet
+// @desc    Get a user's closet
 // @access  Private
 router.get('/', jwtAuth, async (req, res) => {
   try {
-    const garage = await Garage.findOne({ user: req.user.id });
+    const closet = await Closet.findOne({ user: req.user.id });
 
-    res.json(garage);
+    res.json(closet);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');

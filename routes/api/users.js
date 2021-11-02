@@ -5,7 +5,7 @@ const { check, validationResult } = require('express-validator');
 
 const config = require('config');
 const User = require('../../models/User');
-const Garage = require('../../models/Garage');
+const Closet = require('../../models/Closet');
 
 const router = express.Router();
 
@@ -66,14 +66,14 @@ router.post(
         }
       );
 
-      // Create new empty Garage when user registers
-      const garage = new Garage({
+      // Create new empty Closet when user registers
+      const closet = new Closet({
         user: user.id,
         categories: [],
         sharedUsers: [user.id],
       });
 
-      await garage.save();
+      await closet.save();
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server error');

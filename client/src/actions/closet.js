@@ -1,26 +1,26 @@
 import axios from 'axios';
 
 import {
-  GET_GARAGE,
-  GARAGE_ERROR,
+  GET_CLOSET,
+  CLOSET_ERROR,
   GET_CATEGORIES,
   CATEGORIES_ERROR,
 } from './types';
 
-// Get current user's garage
-export const getCurrentGarage = () => async (dispatch) => {
+// Get current user's closet
+export const getCurrentCloset = () => async (dispatch) => {
   try {
-    const res = await axios.get('/api/garage');
+    const res = await axios.get('/api/closet');
     console.log(res);
 
     dispatch({
-      type: GET_GARAGE,
+      type: GET_CLOSET,
       payload: res.data,
     });
   } catch (err) {
     console.log(err);
     dispatch({
-      type: GARAGE_ERROR,
+      type: CLOSET_ERROR,
       payload: { msg: err.response.statusText, status: err.response.status },
     });
   }

@@ -7,8 +7,10 @@ import mapboxgl from 'mapbox-gl';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import doubleClickZoom from '@mapbox/mapbox-gl-draw/src/lib/double_click_zoom';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
+
 import filterObject from '../../utils/filterObject';
 import extendDrawBar from '../../utils/extendDrawBar';
+import DrawRoute from '../../draw/DrawRoute';
 
 const MapComponentContainer = styled.div`
   margin: 0;
@@ -31,126 +33,13 @@ const MapControlsContainer = styled.div`
 `;
 
 const MapContainer = styled.div`
-  height: 100vh;
+  height: 80vh;
   width: 100vw;
 `;
 
+// TODO: Create a private route that calls Mapbox API so we don't need this accessToken here
 mapboxgl.accessToken =
   'pk.eyJ1IjoibWF4d2FuZzA1MSIsImEiOiJja3J3a3g4Z24waG03MnZtaWthZGUwbzdvIn0.zHmuo1QvKneRY5nJy2TgAQ';
-
-var DrawRoute = {};
-
-// When the mode starts this function will be called.
-// The `opts` argument comes from `draw.changeMode('lotsofpoints', {count:7})`.
-// The value returned should be an object and will be passed to all other lifecycle functions
-DrawRoute.onSetup = function (opts) {
-  console.log(opts);
-  var state = {
-    points: [],
-    lines: [],
-  };
-  state.count = opts.count || 0;
-  doubleClickZoom.disable(this);
-  return state;
-};
-
-// Whenever a user clicks on the map, Draw will call `onClick`
-DrawRoute.onClick = function (state, e) {
-  // `this.newFeature` takes geojson and makes a DrawFeature
-
-  var point = this.newFeature({
-    type: 'Feature',
-    properties: {
-      count: state.count,
-    },
-    geometry: {
-      type: 'Point',
-      coordinates: [e.lngLat.lng, e.lngLat.lat],
-    },
-  });
-
-  const features = this._ctx.store._features;
-
-  if (state.points.length > 0) {
-    const pointFeatures = filterObject(
-      features,
-      (feature) => feature.type === 'Point'
-    );
-    const lastPointId = Object.keys(pointFeatures)[
-      Object.keys(pointFeatures).length - 1
-    ];
-    const lastPoint = state.points[state.points.length - 1];
-    console.log(lastPoint);
-
-    const coordinates = `${lastPoint.coordinates[0]},${lastPoint.coordinates[1]};${point.coordinates[0]},${point.coordinates[1]}`;
-
-    getMatch(coordinates, [35, 35], 'walking').then((lineCoordinates) => {
-      let line = null;
-      if (!lineCoordinates) {
-        console.log('No coordinates to get here');
-
-        line = this.newFeature({
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'LineString',
-            coordinates: [lastPoint.coordinates, point.coordinates],
-          },
-        });
-      } else {
-        // Add new line feature to object here using coords
-        line = this.newFeature({
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'LineString',
-            coordinates: lineCoordinates,
-          },
-        });
-      }
-      this.addFeature(line);
-      this._ctx.store.render();
-      console.log(this._ctx.store._features);
-    });
-  }
-  state.points.push(point);
-  this.addFeature(point);
-};
-
-// Whenever a user clicks on a key while focused on the map, it will be sent here
-DrawRoute.onStop = function (state) {
-  doubleClickZoom.enable(this);
-  console.log('Stopped drawing route');
-};
-
-// This is the only required function for a mode.
-// It decides which features currently in Draw's data store will be rendered on the map.
-// All features passed to `display` will be rendered, so you can pass multiple display features per internal feature.
-// See `styling-draw` in `API.md` for advice on making display features
-DrawRoute.toDisplayFeatures = function (state, geojson, display) {
-  display(geojson);
-};
-
-// Make a Map Matching request
-const getMatch = async (coordinates, radius, profile) => {
-  // Separate the radiuses with semicolons
-  const radiuses = radius.join(';');
-  // Create the query
-  const query = await fetch(
-    `https://api.mapbox.com/matching/v5/mapbox/${profile}/${coordinates}?geometries=geojson&radiuses=${radiuses}&steps=true&access_token=${mapboxgl.accessToken}`,
-    { method: 'GET' }
-  );
-  const response = await query.json();
-  console.log(response);
-  // Handle errors
-  if (response.code !== 'Ok') {
-    return;
-  }
-  // Get the coordinates from the response
-  const coords = response.matchings[0].geometry.coordinates;
-  // Code from the next step will go here
-  return coords;
-};
 
 const draw = new MapboxDraw({
   displayControlsDefault: false,
@@ -341,6 +230,10 @@ const Map = () => {
     console.log(drawingRoute);
   };
 
+  const saveRoute = () => {
+    console.log(draw.getAll());
+  };
+
   return (
     <MapComponentContainer>
       <div>
@@ -350,8 +243,9 @@ const Map = () => {
           </Button>
         </MapControlsContainer> */}
         <MapContainer ref={mapContainer} />
-        <div id="calculated-line"></div>
-        <div></div>
+        <div style={{ position: 'absolute', right: 0 }}>
+          <Button onClick={saveRoute}>save</Button>
+        </div>
       </div>
     </MapComponentContainer>
   );

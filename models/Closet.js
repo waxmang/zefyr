@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const GarageSchema = new mongoose.Schema({
+const ClosetSchema = new mongoose.Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: 'users',
@@ -15,4 +15,4 @@ const GarageSchema = new mongoose.Schema({
   sharedUsers: [{ type: Schema.Types.ObjectId, ref: 'users' }],
 });
 
-module.exports = Garage = mongoose.model('garage', GarageSchema);
+module.exports = Closet = mongoose.model('closet', ClosetSchema);
