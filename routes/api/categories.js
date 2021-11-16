@@ -2,14 +2,14 @@ const express = require('express');
 const { check, validationResult } = require('express-validator');
 
 const config = require('config');
-const Closet = require('../../models/Closet');
-const Item = require('../../models/Item');
-const Category = require('../../models/Category');
+const Closet = require('../../models/closet/Closet');
+const Item = require('../../models/closet/Item');
+const Category = require('../../models/closet/Category');
 const jwtAuth = require('../../middleware/jwtAuth');
 
 const router = express.Router();
 
-// @route   POST api/category
+// @route   POST api/categories
 // @desc    Add category to current user's closet
 // @access  Private
 router.post('/', jwtAuth, async (req, res) => {

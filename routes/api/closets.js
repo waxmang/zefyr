@@ -1,7 +1,7 @@
 const express = require('express');
 
 const config = require('config');
-const Closet = require('../../models/Closet');
+const Closet = require('../../models/closet/Closet');
 const jwtAuth = require('../../middleware/jwtAuth');
 
 const router = express.Router();
@@ -32,7 +32,6 @@ router.put('/', jwtAuth, async (req, res) => {
   try {
     const closetFields = {
       categories: req.body.categories,
-      sharedUsers: req.body.sharedUsers,
     };
 
     // Remove null values from itemFields

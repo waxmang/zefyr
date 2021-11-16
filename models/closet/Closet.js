@@ -12,7 +12,6 @@ const ClosetSchema = new mongoose.Schema({
       ref: 'categories',
     },
   ],
-  sharedUsers: [{ type: Schema.Types.ObjectId, ref: 'users' }],
 });
 
 module.exports = Closet = mongoose.model('closet', ClosetSchema);

@@ -2,10 +2,10 @@ const express = require('express');
 const { check, validationResult } = require('express-validator');
 
 const config = require('config');
-const Closet = require('../../models/Closet');
-const Item = require('../../models/Item');
+const Closet = require('../../models/closet/Closet');
+const Item = require('../../models/closet/Item');
 const jwtAuth = require('../../middleware/jwtAuth');
-const Category = require('../../models/Category');
+const Category = require('../../models/closet/Category');
 
 const router = express.Router();
 

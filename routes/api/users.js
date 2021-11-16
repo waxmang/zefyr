@@ -5,7 +5,7 @@ const { check, validationResult } = require('express-validator');
 
 const config = require('config');
 const User = require('../../models/User');
-const Closet = require('../../models/Closet');
+const Closet = require('../../models/closet/Closet');
 
 const router = express.Router();
 
@@ -80,5 +80,25 @@ router.post(
     }
   }
 );
+
+// @route   GET api/users/:emailAddress
+// @desc    Find user by email address
+// @access  Public
+router.get('/', async (req, res) => {
+  const { email } = req.query;
+  console.log(email);
+  try {
+    const user = await User.findOne({ email: email });
+
+    if (!user) {
+      return res.status(404).json({ error: 'Email address does not exist' });
+    } else {
+      res.json(user);
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
 
 module.exports = router;

@@ -102,7 +102,7 @@ const Closet = ({
             category: newDestinationCategory,
           },
         });
-        axios.put(`/api/category/${destinationCategoryId}`, {
+        axios.put(`/api/categories/${destinationCategoryId}`, {
           items: newDestinationItems,
         });
       }
@@ -113,12 +113,14 @@ const Closet = ({
         type: EDIT_CATEGORY,
         payload: { category: newSourceCategory },
       });
-      axios.put(`/api/category/${sourceCategoryId}`, { items: newSourceItems });
+      axios.put(`/api/categories/${sourceCategoryId}`, {
+        items: newSourceItems,
+      });
     }
   };
 
   const onAddCategory = async () => {
-    await axios.post('/api/category', { closet: closet._id });
+    await axios.post('/api/categories', { closet: closet._id });
     getCurrentUserCategories();
     getCurrentCloset();
   };

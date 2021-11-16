@@ -78,8 +78,8 @@ input:focus {
   margin: auto;
   overflow: hidden;
   padding: 0 2rem;
-  margin-top: 6rem;
   margin-bottom: 3rem;
+  margin-left: 220px;
 }
 
 /* Text Styles*/

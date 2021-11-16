@@ -20,6 +20,7 @@
     "gravatar": "^1.8.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.13.5",
+    "multer": "^1.4.3",
     "react-dropdown": "^1.9.2",
     "react-table": "^7.7.0",
     "request": "^2.88.2",

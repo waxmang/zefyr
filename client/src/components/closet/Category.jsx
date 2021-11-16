@@ -13,7 +13,7 @@ const Category = ({ category }) => {
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-      axios.put(`/api/category/${category._id}`, category);
+      axios.put(`/api/categories/${category._id}`, category);
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
@@ -33,7 +33,7 @@ const Category = ({ category }) => {
       type: DELETE_CATEGORY,
       payload: { category: category },
     });
-    axios.delete(`/api/category/${category._id}`);
+    axios.delete(`/api/categories/${category._id}`);
   };
 
   return (

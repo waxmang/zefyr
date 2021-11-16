@@ -12,16 +12,22 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components';
 
-const LandingContainer = styled.div`
-  height: 100%;
-  width: 240px;
+const SidebarContainer = styled.div`
+  height: 50vh;
+  width: 220px;
+  min-width: 200px;
+  padding: 20px;
+  margin: 20px;
   position: fixed;
   z-index: 1;
   top: 0;
   left: 0;
   overflow-x: hidden;
   background-color: #558b70;
+  border-radius: 20px;
 `;
+
+const Sidebar = styled.nav``;
 
 const Navbar = ({ auth: { isAuthenticated, loading }, logout }) => {
   const authLinks = (
@@ -62,8 +68,8 @@ const Navbar = ({ auth: { isAuthenticated, loading }, logout }) => {
   );
 
   return (
-    <LandingContainer>
-      <nav>
+    <SidebarContainer>
+      <Sidebar>
         <h1>
           <Link to="/">
             <FontAwesomeIcon icon={faRoute} /> Zephyr
@@ -72,8 +78,8 @@ const Navbar = ({ auth: { isAuthenticated, loading }, logout }) => {
         {!loading && (
           <Fragment>{isAuthenticated ? authLinks : guestLinks}</Fragment>
         )}
-      </nav>
-    </LandingContainer>
+      </Sidebar>
+    </SidebarContainer>
   );
 };
 

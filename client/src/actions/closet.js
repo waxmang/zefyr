@@ -29,7 +29,7 @@ export const getCurrentCloset = () => async (dispatch) => {
 // Get current user's categories (along with items)
 export const getCurrentUserCategories = () => async (dispatch) => {
   try {
-    const res = await axios.get('/api/category');
+    const res = await axios.get('/api/categories');
 
     dispatch({
       type: GET_CATEGORIES,
