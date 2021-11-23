@@ -15,16 +15,19 @@ const StepSchema = mongoose.Schema({
   description: {
     type: String,
   },
-  start: {
+  startTime: {
     type: String,
   },
-  end: {
+  endTime: {
     type: String,
   },
   travelMode: {
     type: String,
   },
-  gpxFile: {
+  gpxFilename: {
+    type: 'String',
+  },
+  gpxHash: {
     type: 'Buffer',
   },
 });

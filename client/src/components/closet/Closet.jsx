@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import { connect, useDispatch } from 'react-redux';

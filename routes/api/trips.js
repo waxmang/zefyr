@@ -1,7 +1,6 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
 
-const config = require('config');
 const Step = require('../../models/trip/Step');
 const Trip = require('../../models/trip/Trip');
 const jwtAuth = require('../../middleware/jwtAuth');
@@ -122,6 +121,10 @@ router.get('/:tripId', jwtAuth, async (req, res) => {
       path: 'steps',
       model: Step,
     });
+
+    if (!trip) {
+      return res.status(404).json({ msg: 'Trip not found' });
+    }
 
     if (
       !(

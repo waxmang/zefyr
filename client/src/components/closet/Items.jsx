@@ -1,6 +1,4 @@
 import React from 'react';
-import axios from 'axios';
-import { connect, useDispatch } from 'react-redux';
 import { Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 

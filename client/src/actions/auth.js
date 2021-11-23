@@ -10,6 +10,7 @@ import {
   LOGOUT,
   CLEAR_CLOSET,
   CLEAR_ITEMS,
+  CLEAR_TRIPS,
 } from './types';
 import { setAlert } from './alert';
 import setAuthToken from '../utils/setAuthToken';
@@ -102,5 +103,6 @@ export const login = ({ email, password }) => async (dispatch) => {
 export const logout = () => (dispatch) => {
   dispatch({ type: CLEAR_CLOSET });
   dispatch({ type: CLEAR_ITEMS });
+  dispatch({ type: CLEAR_TRIPS });
   dispatch({ type: LOGOUT });
 };

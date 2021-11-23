@@ -1,12 +1,17 @@
 const express = require('express');
+const dotenv = require('dotenv');
 const connectToDb = require('./config/db');
+const formidableMiddleware = require('express-formidable');
+
+dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 5001;
+const port = process.env.PORT || 5000;
 
 connectToDb();
 
 app.use(express.json({ extended: false }));
+app.use(formidableMiddleware());
 
 app.get('/', (req, res) => {
   res.send('API Running');

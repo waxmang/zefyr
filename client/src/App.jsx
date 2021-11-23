@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import Landing from './components/layout/Landing';
@@ -6,7 +6,8 @@ import Register from './components/auth/Register';
 import Login from './components/auth/Login';
 import Alert from './components/layout/Alert';
 import Closet from './components/closet/Closet';
-import Map from './components/map/Map';
+import Trips from './components/trips/Trips';
+import Trip from './components/trips/Trip';
 import PrivateRoute from './components/routing/PrivateRoute';
 import 'sanitize.css';
 import './App.css';
@@ -17,7 +18,6 @@ import store from './store';
 import { loadUser } from './actions/auth';
 import setAuthToken from './utils/setAuthToken';
 import Sidebar from './components/layout/Sidebar';
-import Trips from './components/trips/Trips';
 
 if (localStorage.token) {
   // Set auth header for private requests
@@ -41,8 +41,8 @@ const App = () => {
               <Route exact path="/register" component={Register} />
               <Route exact path="/login" component={Login} />
               <PrivateRoute exact path="/closet" component={Closet} />
-              <PrivateRoute exact path="/map" component={Map} />
               <PrivateRoute exact path="/trips" component={Trips} />
+              <PrivateRoute path="/trips/:tripId" component={Trip} />
             </Switch>
           </section>
         </Fragment>

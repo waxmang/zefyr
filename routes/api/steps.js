@@ -5,6 +5,7 @@ const config = require('config');
 const Step = require('../../models/trip/Step');
 const Trip = require('../../models/trip/Trip');
 const jwtAuth = require('../../middleware/jwtAuth');
+const azureStorage = require('../../utils/azure-storage');
 
 const router = express.Router({ mergeParams: true });
 
@@ -12,54 +13,55 @@ const router = express.Router({ mergeParams: true });
 // @desc    Create new step
 // @access  Private
 router.post('/', jwtAuth, async (req, res) => {
-  const { tripId } = req.params;
+  res.json({ asdf: 'asdf' });
+  // const { tripId } = req.params;
 
-  try {
-    const trip = await Trip.findById(tripId);
+  // try {
+  //   const trip = await Trip.findById(tripId);
+  //   console.log(trip);
 
-    if (
-      !(
-        req.user.id === trip.user.toString() ||
-        trip.sharedEditUsers.includes(req.user.id)
-      )
-    ) {
-      return res
-        .status(401)
-        .json({ errors: 'User does not have edit permissions' });
-    }
+  //   if (
+  //     !(
+  //       req.user.id === trip.user.toString() ||
+  //       trip.sharedEditUsers.includes(req.user.id)
+  //     )
+  //   ) {
+  //     return res
+  //       .status(401)
+  //       .json({ errors: 'User does not have edit permissions' });
+  //   }
 
-    const stepFields = {
-      user: req.user.id,
-      trip: tripId,
-      name: req.body.name,
-      description: req.body.description,
-      start: req.body.start,
-      end: req.body.end,
-      travelMode: req.body.travelMode,
-      gpxFile: req.body.gpxFile,
-    };
+  //   const stepFields = {
+  //     user: req.user.id,
+  //     trip: tripId,
+  //     name: req.body.name,
+  //     description: req.body.description,
+  //     startTime: req.body.startTime,
+  //     endTime: req.body.endTime,
+  //     travelMode: req.body.travelMode,
+  //   };
 
-    // Remove null values from itemFields
-    Object.keys(stepFields).forEach(
-      (k) => !stepFields[k] && delete stepFields[k]
-    );
+  //   // Remove null values from itemFields
+  //   Object.keys(stepFields).forEach(
+  //     (k) => !stepFields[k] && delete stepFields[k]
+  //   );
 
-    // Create a new item associated with the closet ID
-    const newStep = new Step(stepFields);
+  //   // Create a new item associated with the closet ID
+  //   const newStep = new Step(stepFields);
 
-    const step = await newStep.save();
+  //   const step = await newStep.save();
 
-    const newTripSteps = [...trip.steps, newStep._id];
+  //   const newTripSteps = [...trip.steps, newStep._id];
 
-    await Trip.findByIdAndUpdate(tripId, {
-      steps: newTripSteps,
-    });
+  //   await Trip.findByIdAndUpdate(tripId, {
+  //     steps: newTripSteps,
+  //   });
 
-    res.json(step);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
-  }
+  //   res.json(step);
+  // } catch (err) {
+  //   console.error(err.message);
+  //   res.status(500).send('Server error');
+  // }
 });
 
 // @route   PUT api/trips/:tripId/steps/:stepId
@@ -86,10 +88,9 @@ router.put('/:stepId', jwtAuth, async (req, res) => {
     const stepFields = {
       name: req.body.name,
       description: req.body.description,
-      start: req.body.start,
-      end: req.body.end,
+      startTime: req.body.startTime,
+      endTime: req.body.endTime,
       travelMode: req.body.travelMode,
-      gpxFile: req.body.gpxFile,
     };
 
     // Remove null values from tripFields
@@ -108,7 +109,101 @@ router.put('/:stepId', jwtAuth, async (req, res) => {
   }
 });
 
-router.delete('/:tripId/steps/:stepId', jwtAuth, async (req, res) => {
+// @route   PUT api/trips/:tripId/steps/:stepId
+// @desc    Modify step
+// @access  Private
+router.put('/:stepId/gpx', jwtAuth, async (req, res) => {
+  const { tripId, stepId } = req.params;
+
+  try {
+    const trip = await Trip.findById(tripId);
+
+    // Check if user has edit permissions
+    if (
+      !(
+        req.user.id === trip.user.toString() ||
+        trip.sharedEditUsers.includes(req.user.id)
+      )
+    ) {
+      return res
+        .status(401)
+        .json({ errors: 'User does not have edit permissions' });
+    }
+
+    const containerClient = azureStorage.blobServiceClient.getContainerClient(
+      process.env.CONTAINER_NAME
+    );
+
+    const gpxFile = req.files.gpxFile;
+    const blobName = `${gpxFile.name}${new Date().toISOString()}`;
+    console.log('blobName', blobName);
+
+    try {
+      const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+      const uploadBlobResponse = await blockBlobClient.uploadFile(gpxFile.path);
+
+      console.log(uploadBlobResponse);
+      const step = await Step.findByIdAndUpdate(stepId, {
+        gpxFilename: blobName,
+        gpxHash: uploadBlobResponse.contentMD5,
+      });
+
+      res.json(step);
+    } catch (err) {
+      console.error('err:::', err);
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+router.get('/:stepId/gpx', jwtAuth, async (req, res) => {
+  const { tripId, stepId } = req.params;
+
+  try {
+    const trip = await Trip.findById(tripId);
+
+    // Check if user has read permissions
+    if (
+      !(
+        req.user.id === trip.user.toString() ||
+        trip.sharedReadUsers.includes(req.user.id)
+      )
+    ) {
+      return res
+        .status(401)
+        .json({ msg: 'User does not have read permissions' });
+    }
+
+    const step = await Step.findById(stepId);
+
+    if (!step) {
+      return res.status(404).json({ msg: 'Step not found' });
+    }
+
+    const { gpxFilename, gpxHash } = step;
+    // console.log(step);
+
+    const { contentMD5, fileContents } = await azureStorage.downloadFile(
+      gpxFilename
+    );
+
+    // Only return file to user if the hash for the current step matches the hash of the file being requested
+    if (!contentMD5.compare(gpxHash) === 0) {
+      return res
+        .status(401)
+        .json({ msg: 'User does not have read permissions' });
+    }
+
+    res.json({ gpxFile: fileContents });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+router.delete('/:stepId', jwtAuth, async (req, res) => {
   const { tripId, stepId } = req.params;
 
   try {
