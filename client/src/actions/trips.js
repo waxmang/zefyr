@@ -25,16 +25,33 @@ export const getUserTrip = (tripId) => async (dispatch) => {
     const res = await axios.get(`/api/trips/${tripId}`);
     const gpxFiles = {};
 
-    res.data.steps.forEach(async (step) => {
-      const res = await axios.get(`/api/trips/${tripId}/steps/${step._id}/gpx`);
+    // res.data.steps.forEach(async (step) => {
+    //   if (step.hasOwnProperty('gpxFilename') && step.gpxFilename !== null) {
+    //     console.log('getting gpx');
+    //     const res = await axios.get(
+    //       `/api/trips/${tripId}/steps/${step._id}/gpx`
+    //     );
+    //     console.log(res);
 
-      gpxFiles[step._id] = res.data.gpxFile;
-    });
+    //     gpxFiles[step._id] = res.data.gpxFile;
+    //   }
+    // });
+
+    for (const step of res.data.steps) {
+      if (step.hasOwnProperty('gpxFilename') && step.gpxFilename !== null) {
+        const res = await axios.get(
+          `/api/trips/${tripId}/steps/${step._id}/gpx`
+        );
+        gpxFiles[step._id] = res.data.gpxFile;
+      }
+    }
 
     const payload = {
       trip: res.data,
       gpxFiles: gpxFiles,
     };
+
+    console.log(payload);
 
     dispatch({
       type: GET_TRIP,

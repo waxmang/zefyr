@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import gpxParser from 'gpxparser';
+import GPX from 'gpx-parser-builder';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, Polyline, TileLayer } from 'react-leaflet';
 
@@ -88,6 +89,8 @@ const Trip = ({ match, trips: { trip, gpxFiles }, getUserTrip }) => {
       formData,
       config
     );
+
+    getUserTrip(match.params.tripId);
   };
 
   const onChange = (e, step) => {
@@ -132,14 +135,23 @@ const Trip = ({ match, trips: { trip, gpxFiles }, getUserTrip }) => {
   };
 
   const getMapForStep = (stepId) => {
-    console.log(stepId in gpxFiles);
     if (stepId in gpxFiles) {
-      console.log(gpxFiles[stepId]);
       try {
-        parser.parse(gpxFiles[stepId]);
-        const track = parser.tracks.pop();
-        const positions = track.points.map((p) => [p.lat, p.lon]);
-        console.log(positions);
+        const gpx = GPX.parse(gpxFiles[stepId]);
+        let positions = [];
+
+        if ('rte' in gpx) {
+          const route = gpx.rte[0].rtept;
+          positions = route.map((p) => [p.$.lat, p.$.lon]);
+        } else {
+          console.log(gpx);
+          const track = gpx.trk[0].trkseg[0].trkpt;
+          positions = track.map((p) => [p.$.lat, p.$.lon]);
+        }
+        // parser.parse(gpxFiles[stepId]);
+        // const track = parser.tracks.pop();
+        // const positions = track.points.map((p) => [p.lat, p.lon]);
+        // console.log(positions);
         return (
           <MapContainer
             center={positions[0]}
@@ -151,7 +163,7 @@ const Trip = ({ match, trips: { trip, gpxFiles }, getUserTrip }) => {
             />
             <Polyline
               pathOptions={{ fillColor: 'red', color: 'blue' }}
-              positions={[positions[0]]}
+              positions={[positions]}
             />
           </MapContainer>
         );
@@ -188,7 +200,7 @@ const Trip = ({ match, trips: { trip, gpxFiles }, getUserTrip }) => {
           <p>Start Time: {step.startTime}</p>
           <p>End Time: {step.endTime}</p>
           <p>Travel Mode: {step.travelMode}</p>
-          {gpxFiles && getMapForStep(step._id)}
+          {getMapForStep(step._id)}
           <button onClick={(e) => toggleEditStep(step._id)}>Edit</button>
         </Step>
       );
@@ -249,6 +261,7 @@ const Trip = ({ match, trips: { trip, gpxFiles }, getUserTrip }) => {
           <button
             onClick={() => {
               onFileUpload(step._id);
+              toggleEditStep(step._id);
             }}
           >
             Upload

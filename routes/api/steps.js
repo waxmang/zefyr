@@ -1,5 +1,6 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
+const multer = require('multer');
 
 const config = require('config');
 const Step = require('../../models/trip/Step');
@@ -13,55 +14,54 @@ const router = express.Router({ mergeParams: true });
 // @desc    Create new step
 // @access  Private
 router.post('/', jwtAuth, async (req, res) => {
-  res.json({ asdf: 'asdf' });
-  // const { tripId } = req.params;
+  const { tripId } = req.params;
 
-  // try {
-  //   const trip = await Trip.findById(tripId);
-  //   console.log(trip);
+  try {
+    const trip = await Trip.findById(tripId);
+    console.log(trip);
 
-  //   if (
-  //     !(
-  //       req.user.id === trip.user.toString() ||
-  //       trip.sharedEditUsers.includes(req.user.id)
-  //     )
-  //   ) {
-  //     return res
-  //       .status(401)
-  //       .json({ errors: 'User does not have edit permissions' });
-  //   }
+    if (
+      !(
+        req.user.id === trip.user.toString() ||
+        trip.sharedEditUsers.includes(req.user.id)
+      )
+    ) {
+      return res
+        .status(401)
+        .json({ errors: 'User does not have edit permissions' });
+    }
 
-  //   const stepFields = {
-  //     user: req.user.id,
-  //     trip: tripId,
-  //     name: req.body.name,
-  //     description: req.body.description,
-  //     startTime: req.body.startTime,
-  //     endTime: req.body.endTime,
-  //     travelMode: req.body.travelMode,
-  //   };
+    const stepFields = {
+      user: req.user.id,
+      trip: tripId,
+      name: req.body.name,
+      description: req.body.description,
+      startTime: req.body.startTime,
+      endTime: req.body.endTime,
+      travelMode: req.body.travelMode,
+    };
 
-  //   // Remove null values from itemFields
-  //   Object.keys(stepFields).forEach(
-  //     (k) => !stepFields[k] && delete stepFields[k]
-  //   );
+    // Remove null values from itemFields
+    Object.keys(stepFields).forEach(
+      (k) => !stepFields[k] && delete stepFields[k]
+    );
 
-  //   // Create a new item associated with the closet ID
-  //   const newStep = new Step(stepFields);
+    // Create a new item associated with the closet ID
+    const newStep = new Step(stepFields);
 
-  //   const step = await newStep.save();
+    const step = await newStep.save();
 
-  //   const newTripSteps = [...trip.steps, newStep._id];
+    const newTripSteps = [...trip.steps, newStep._id];
 
-  //   await Trip.findByIdAndUpdate(tripId, {
-  //     steps: newTripSteps,
-  //   });
+    await Trip.findByIdAndUpdate(tripId, {
+      steps: newTripSteps,
+    });
 
-  //   res.json(step);
-  // } catch (err) {
-  //   console.error(err.message);
-  //   res.status(500).send('Server error');
-  // }
+    res.json(step);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
 });
 
 // @route   PUT api/trips/:tripId/steps/:stepId
@@ -112,51 +112,55 @@ router.put('/:stepId', jwtAuth, async (req, res) => {
 // @route   PUT api/trips/:tripId/steps/:stepId
 // @desc    Modify step
 // @access  Private
-router.put('/:stepId/gpx', jwtAuth, async (req, res) => {
-  const { tripId, stepId } = req.params;
-
-  try {
-    const trip = await Trip.findById(tripId);
-
-    // Check if user has edit permissions
-    if (
-      !(
-        req.user.id === trip.user.toString() ||
-        trip.sharedEditUsers.includes(req.user.id)
-      )
-    ) {
-      return res
-        .status(401)
-        .json({ errors: 'User does not have edit permissions' });
-    }
-
-    const containerClient = azureStorage.blobServiceClient.getContainerClient(
-      process.env.CONTAINER_NAME
-    );
-
-    const gpxFile = req.files.gpxFile;
-    const blobName = `${gpxFile.name}${new Date().toISOString()}`;
-    console.log('blobName', blobName);
+router.put(
+  '/:stepId/gpx',
+  [jwtAuth, multer().single('gpxFile')],
+  async (req, res) => {
+    const { tripId, stepId } = req.params;
 
     try {
-      const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-      const uploadBlobResponse = await blockBlobClient.uploadFile(gpxFile.path);
+      const trip = await Trip.findById(tripId);
 
-      console.log(uploadBlobResponse);
-      const step = await Step.findByIdAndUpdate(stepId, {
-        gpxFilename: blobName,
-        gpxHash: uploadBlobResponse.contentMD5,
-      });
+      // Check if user has edit permissions
+      if (
+        !(
+          req.user.id === trip.user.toString() ||
+          trip.sharedEditUsers.includes(req.user.id)
+        )
+      ) {
+        return res
+          .status(401)
+          .json({ errors: 'User does not have edit permissions' });
+      }
 
-      res.json(step);
+      const containerClient = azureStorage.blobServiceClient.getContainerClient(
+        process.env.CONTAINER_NAME
+      );
+
+      const gpxFile = req.file;
+      const blobName = `${gpxFile.originalname}${new Date().toISOString()}`;
+      // console.log('blobName', blobName);
+
+      try {
+        const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+        const uploadBlobResponse = await blockBlobClient.upload(
+          gpxFile.buffer,
+          gpxFile.size
+        );
+        const step = await Step.findByIdAndUpdate(stepId, {
+          gpxFilename: blobName,
+          gpxHash: uploadBlobResponse.contentMD5,
+        });
+        res.json(step);
+      } catch (err) {
+        console.error('err:::', err);
+      }
     } catch (err) {
-      console.error('err:::', err);
+      console.error(err.message);
+      res.status(500).send('Server error');
     }
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
   }
-});
+);
 
 router.get('/:stepId/gpx', jwtAuth, async (req, res) => {
   const { tripId, stepId } = req.params;
@@ -177,6 +181,7 @@ router.get('/:stepId/gpx', jwtAuth, async (req, res) => {
     }
 
     const step = await Step.findById(stepId);
+    // if (step.hasOwnProperty('gpxFilename'));
 
     if (!step) {
       return res.status(404).json({ msg: 'Step not found' });
@@ -185,18 +190,22 @@ router.get('/:stepId/gpx', jwtAuth, async (req, res) => {
     const { gpxFilename, gpxHash } = step;
     // console.log(step);
 
-    const { contentMD5, fileContents } = await azureStorage.downloadFile(
-      gpxFilename
-    );
+    try {
+      const { contentMD5, fileContents } = await azureStorage.downloadFile(
+        gpxFilename
+      );
 
-    // Only return file to user if the hash for the current step matches the hash of the file being requested
-    if (!contentMD5.compare(gpxHash) === 0) {
-      return res
-        .status(401)
-        .json({ msg: 'User does not have read permissions' });
+      // Only return file to user if the hash for the current step matches the hash of the file being requested
+      if (!contentMD5.compare(gpxHash) === 0) {
+        return res
+          .status(401)
+          .json({ msg: 'User does not have read permissions' });
+      }
+
+      res.json({ gpxFile: fileContents });
+    } catch (error) {
+      res.status(404).send('GPX file not found');
     }
-
-    res.json({ gpxFile: fileContents });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
