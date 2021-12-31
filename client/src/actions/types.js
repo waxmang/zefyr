@@ -17,6 +17,11 @@ export const GET_CLOSET = 'GET_CLOSET';
 export const CLOSET_ERROR = 'CLOSET_ERROR';
 export const CLEAR_CLOSET = 'CLEAR_CLOSET';
 
+export const GET_PACKING_LISTS = 'GET_PACKING_LISTS';
+export const GET_PACKING_LIST = 'GET_PACKING_LIST';
+export const EDIT_PACKING_LIST = 'EDIT_PACKING_LIST';
+export const DELETE_PACKING_LIST = 'DELETE_PACKING_LIST';
+
 export const GET_ITEMS = 'GET_ITEMS';
 export const ITEMS_ERROR = 'ITEMS_ERROR';
 export const CLEAR_ITEMS = 'CLEAR_ITEMS';
@@ -33,6 +38,7 @@ export const GET_TRIPS = 'GET_TRIPS';
 export const GET_TRIP = 'GET_TRIP';
 export const TRIPS_ERROR = 'TRIPS_ERROR';
 export const EDIT_TRIP = 'EDIT_TRIP';
+export const EDIT_TRIP_LINKS = 'EDIT_TRIP_LINKS';
 export const DELETE_TRIP = 'DELETE_TRIP';
 export const CLEAR_TRIPS = 'CLEAR_TRIPS';
 
