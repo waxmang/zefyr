@@ -3,6 +3,7 @@ const { check, validationResult } = require('express-validator');
 
 const Step = require('../../models/trip/Step');
 const Trip = require('../../models/trip/Trip');
+const PackingList = require('../../models/closet/PackingList');
 const jwtAuth = require('../../middleware/jwtAuth');
 const itemRouter = require('./steps');
 // console.log(TEST);
@@ -117,10 +118,15 @@ router.get('/', jwtAuth, async (req, res) => {
 router.get('/:tripId', jwtAuth, async (req, res) => {
   const { tripId } = req.params;
   try {
-    const trip = await Trip.findById(tripId).populate({
-      path: 'steps',
-      model: Step,
-    });
+    const trip = await Trip.findById(tripId)
+      .populate({
+        path: 'steps',
+        model: Step,
+      })
+      .populate({
+        path: 'packingLists',
+        model: PackingList,
+      });
 
     if (!trip) {
       return res.status(404).json({ msg: 'Trip not found' });

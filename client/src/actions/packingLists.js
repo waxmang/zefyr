@@ -36,3 +36,26 @@ export const getPackingList = (packingListId) => async (dispatch) => {
     console.log(err);
   }
 };
+
+export const togglePackingListItem = (packingList, itemToToggle) => async (
+  dispatch
+) => {
+  const items = [...packingList.items];
+
+  // Check if item is already in items. If not, append. If so, remove
+  const itemFound = items.find((item) => item._id === itemToToggle._id);
+  if (itemFound === undefined) {
+    items.push(itemToToggle);
+  } else {
+    items.splice(items.indexOf(itemFound), 1);
+  }
+
+  const newPackingList = { ...packingList, items: items };
+
+  dispatch({
+    type: EDIT_PACKING_LIST,
+    payload: {
+      packingList: newPackingList,
+    },
+  });
+};

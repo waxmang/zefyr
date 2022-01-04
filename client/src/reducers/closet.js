@@ -15,7 +15,9 @@ import {
 const initialState = {
   closet: null,
   categories: null,
-  loading: true,
+  allItems: null,
+  loadingCloset: true,
+  loadingCategories: true,
   error: {},
 };
 
@@ -27,32 +29,38 @@ export default function profile(state = initialState, action) {
       return {
         ...state,
         closet: payload,
-        loading: false,
+        loadingCloset: false,
       };
     case GET_CATEGORIES:
+      let allItems = [];
+      payload.forEach(
+        (category) => (allItems = allItems.concat(category.items))
+      );
       return {
         ...state,
         categories: payload,
-        loading: false,
+        allItems: allItems,
+        loadingCategories: false,
       };
     case CLOSET_ERROR:
     case CATEGORIES_ERROR:
       return {
         ...state,
         error: payload,
-        loading: false,
+        loadingCloset: false,
+        loadingCategories: false,
       };
     case CLEAR_CLOSET:
       return {
         ...state,
         closet: null,
-        loading: false,
+        loadingCloset: false,
       };
     case CLEAR_ITEMS:
       return {
         ...state,
         categories: null,
-        loading: false,
+        loadingCategories: false,
       };
     case EDIT_ITEM: {
       const category = state.categories.find(
