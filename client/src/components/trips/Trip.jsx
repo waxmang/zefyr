@@ -6,13 +6,15 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import gpxParser from 'gpxparser';
 import GPX from 'gpx-parser-builder';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, Polyline, TileLayer } from 'react-leaflet';
+import Dropdown from 'react-dropdown';
+import 'react-dropdown/style.css';
 
 import { DELETE_STEP, EDIT_STEP, EDIT_TRIP } from '../../actions/types';
 import { getUserTrip } from '../../actions/trips';
+import { getPackingLists } from '../../actions/packingLists';
 import Links from './Links';
 import TripInfo from './TripInfo';
 
@@ -29,7 +31,14 @@ const Step = styled.div`
 const jawgAccessToken =
   'wFM7G4Sb88GGSS2VLoo2cY2IGkIo8IPkcbwuXgvnzjwJYl9x8qBPUIAP7URH112a';
 
-const Trip = ({ match, trips: { trip, gpxFiles }, getUserTrip }) => {
+const Trip = ({
+  match,
+  trips: { trip, gpxFiles },
+  packingLists: { packingLists },
+  auth: { user },
+  getUserTrip,
+  getPackingLists,
+}) => {
   const [filesToUpload, setFilesToUpload] = useState({});
   const [newFileStepId, setNewFileStepId] = useState('');
   const [stepsBeingEdited, setStepsBeingEdited] = useState([]);
@@ -50,7 +59,8 @@ const Trip = ({ match, trips: { trip, gpxFiles }, getUserTrip }) => {
 
   useEffect(() => {
     getUserTrip(match.params.tripId);
-  }, [getUserTrip, match.params.tripId]);
+    getPackingLists();
+  }, [getUserTrip, getPackingLists, match.params.tripId]);
 
   const onFileChange = (stepId, e) => {
     setFilesToUpload((prevState) => ({
@@ -245,6 +255,48 @@ const Trip = ({ match, trips: { trip, gpxFiles }, getUserTrip }) => {
     }
   };
 
+  const getUsersSelectedPackingList = () => {
+    const packingList = trip.packingLists.find(
+      (packingList) => packingList.user === user._id
+    );
+
+    return packingList !== undefined
+      ? { value: packingList._id, label: packingList.name }
+      : null;
+  };
+
+  const onChangePackingList = async (e) => {
+    const { value } = e;
+    const newPackingLists = [...trip.packingLists];
+    const newPackingList = packingLists.find(
+      (packingList) => packingList._id === value
+    );
+    const existingPackingList = getUsersSelectedPackingList();
+    if (existingPackingList === null) {
+      // User has not selected a packing list
+      newPackingLists.push(newPackingList);
+    } else {
+      // Replace existing list with new one
+      const index = trip.packingLists.indexOf(
+        trip.packingLists.find(
+          (packingList) => packingList._id === existingPackingList.value
+        )
+      );
+      newPackingLists.splice(index, 1, newPackingList);
+    }
+
+    const newTrip = { ...trip, packingLists: newPackingLists };
+    await axios.put(`/api/trips/${trip._id}`, {
+      packingLists: newPackingLists,
+    });
+    dispatch({
+      type: EDIT_TRIP,
+      payload: {
+        trip: newTrip,
+      },
+    });
+  };
+
   return (
     <TripContainer>
       <Link to="/trips">
@@ -263,8 +315,20 @@ const Trip = ({ match, trips: { trip, gpxFiles }, getUserTrip }) => {
             <p>
               <b>Packing Lists:</b>
             </p>
+            {/* Dropdown for selecting Packing List */}
+            <Dropdown
+              value={getUsersSelectedPackingList()}
+              options={packingLists.map((packingList) => ({
+                value: packingList._id,
+                label: packingList.name,
+              }))}
+              onChange={onChangePackingList}
+              placeholder="Select a Packing List"
+            />
             {trip.packingLists.map((packingList) => (
-              <div>{packingList.name}</div>
+              <Link to={`/packing-lists/${packingList._id}`}>
+                {packingList.name}
+              </Link>
             ))}
           </div>
           <div>
@@ -284,11 +348,16 @@ const Trip = ({ match, trips: { trip, gpxFiles }, getUserTrip }) => {
 
 Trip.propTypes = {
   getUserTrip: PropTypes.func.isRequired,
+  getPackingLists: PropTypes.func.isRequired,
   trips: PropTypes.object.isRequired,
+  packingLists: PropTypes.object.isRequired,
+  auth: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   trips: state.trips,
+  packingLists: state.packingLists,
+  auth: state.auth,
 });
 
-export default connect(mapStateToProps, { getUserTrip })(Trip);
+export default connect(mapStateToProps, { getUserTrip, getPackingLists })(Trip);

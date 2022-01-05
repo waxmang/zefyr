@@ -11,7 +11,6 @@ import {
 export const getCurrentCloset = () => async (dispatch) => {
   try {
     const res = await axios.get('/api/closet');
-    console.log(res);
 
     dispatch({
       type: GET_CLOSET,

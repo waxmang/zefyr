@@ -52,7 +52,9 @@ const TripInfo = ({ trip }) => {
     const res = await axios.get(`/api/trips/${trip._id}`);
     dispatch({
       type: EDIT_TRIP,
-      payload: res.data,
+      payload: {
+        trip: res.data,
+      },
     });
   };
 
