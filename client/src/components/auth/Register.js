@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import { connect } from 'react-redux';
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { setAlert } from '../../actions/alert';
 import { register } from '../../actions/auth';
 import PropTypes from 'prop-types';
@@ -29,7 +29,7 @@ const Register = ({ setAlert, register, isAuthenticated }) => {
 
   // Redirect if registration successful
   if (isAuthenticated) {
-    return <Redirect to="/trips" />;
+    return <Navigate replace to="/trips" />;
   }
 
   return (

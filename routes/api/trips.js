@@ -25,8 +25,7 @@ router.post('/', jwtAuth, async (req, res) => {
       startDate: req.body.startDate,
       endDate: req.body.endDate,
       steps: [],
-      sharedReadUsers: [],
-      sharedEditUsers: [],
+      sharedUsers: [],
       packingLists: [],
     };
 
@@ -56,13 +55,12 @@ router.put('/:tripId', jwtAuth, async (req, res) => {
   try {
     const oldTrip = await Trip.findById(tripId);
 
+    const hasEditPermission = oldTrip.sharedUsers.find(
+      (sharedUser) => sharedUser.email === req.user.email && sharedUser.edit
+    );
+
     // Check if user has edit permissions
-    if (
-      !(
-        req.user.id === oldTrip.user.toString() ||
-        oldTrip.sharedEditUsers.includes(req.user.id)
-      )
-    ) {
+    if (!(req.user.id === oldTrip.user.toString() || hasEditPermission)) {
       return res
         .status(401)
         .json({ msg: 'User does not have edit permissions' });
@@ -75,8 +73,7 @@ router.put('/:tripId', jwtAuth, async (req, res) => {
       startDate: req.body.startDate,
       endDate: req.body.endDate,
       steps: req.body.steps,
-      sharedReadUsers: req.body.sharedReadUsers,
-      sharedEditUsers: req.body.sharedEditUsers,
+      sharedUsers: req.body.sharedUsers,
       packingLists: req.body.packingLists,
     };
 
@@ -132,12 +129,11 @@ router.get('/:tripId', jwtAuth, async (req, res) => {
       return res.status(404).json({ msg: 'Trip not found' });
     }
 
-    if (
-      !(
-        req.user.id === trip.user.toString() ||
-        trip.sharedReadUsers.includes(req.user.id)
-      )
-    ) {
+    const hasReadPermission = trip.sharedUsers.find(
+      (sharedUser) => sharedUser.email === req.user.email && sharedUser.read
+    );
+
+    if (!(req.user.id === trip.user.toString() || hasReadPermission)) {
       return res.status(401).json({ msg: 'User does not have permissions' });
     }
 

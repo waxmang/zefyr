@@ -3,13 +3,26 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowAltCircleLeft } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch, connect } from 'react-redux';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import {
+  Box,
+  Input,
+  VStack,
+  HStack,
+  Button,
+  Text,
+  Textarea,
+  Heading,
+  StackDivider,
+  Link,
+} from '@chakra-ui/react';
+import { ChevronRightIcon } from '@chakra-ui/icons';
+import { Select } from 'chakra-react-select';
+import { useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import GPX from 'gpx-parser-builder';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, Polyline, TileLayer } from 'react-leaflet';
-import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 
 import { DELETE_STEP, EDIT_STEP, EDIT_TRIP } from '../../actions/types';
@@ -17,6 +30,7 @@ import { getUserTrip } from '../../actions/trips';
 import { getPackingLists } from '../../actions/packingLists';
 import Links from './Links';
 import TripInfo from './TripInfo';
+import ShareModal from './ShareModal';
 
 const TripContainer = styled.div`
   margin-top: 32px;
@@ -28,11 +42,14 @@ const Step = styled.div`
   padding: 8px;
 `;
 
+const CustomFontAwesomeIcon = styled(FontAwesomeIcon)`
+  margin-bottom: 16px;
+`;
+
 const jawgAccessToken =
   'wFM7G4Sb88GGSS2VLoo2cY2IGkIo8IPkcbwuXgvnzjwJYl9x8qBPUIAP7URH112a';
 
 const Trip = ({
-  match,
   trips: { trip, gpxFiles },
   packingLists: { packingLists },
   auth: { user },
@@ -44,23 +61,21 @@ const Trip = ({
   const [stepsBeingEdited, setStepsBeingEdited] = useState([]);
 
   const dispatch = useDispatch();
+  const params = useParams();
   const reader = new FileReader();
   reader.addEventListener('load', async (e) => {
     const result = e.target.result.split(',')[1];
-    await axios.put(
-      `/api/trips/${match.params.tripId}/steps/${newFileStepId}`,
-      {
-        gpxFile: result,
-      }
-    );
+    await axios.put(`/api/trips/${params.tripId}/steps/${newFileStepId}`, {
+      gpxFile: result,
+    });
     setNewFileStepId('');
-    getUserTrip(match.params.tripId);
+    getUserTrip(params.tripId);
   });
 
   useEffect(() => {
-    getUserTrip(match.params.tripId);
+    getUserTrip(params.tripId);
     getPackingLists();
-  }, [getUserTrip, getPackingLists, match.params.tripId]);
+  }, [getUserTrip, getPackingLists, params.tripId]);
 
   const onFileChange = (stepId, e) => {
     setFilesToUpload((prevState) => ({
@@ -79,12 +94,12 @@ const Trip = ({
       },
     };
     axios.put(
-      `/api/trips/${match.params.tripId}/steps/${stepId}/gpx`,
+      `/api/trips/${params.tripId}/steps/${stepId}/gpx`,
       formData,
       config
     );
 
-    getUserTrip(match.params.tripId);
+    getUserTrip(params.tripId);
   };
 
   const onChangeStep = (e, step) => {
@@ -96,25 +111,24 @@ const Trip = ({
     });
   };
 
+  const onChangeTravelMode = (e, step) => {};
+
   const onSaveStep = async (step) => {
     const newStep = { ...step };
     delete newStep.gpxFile;
-    await axios.put(
-      `/api/trips/${match.params.tripId}/steps/${step._id}`,
-      newStep
-    );
+    await axios.put(`/api/trips/${params.tripId}/steps/${step._id}`, newStep);
   };
 
   const onAddStep = async () => {
-    console.log('addStep for ', match.params.tripId);
-    const res = await axios.post(`/api/trips/${match.params.tripId}/steps`, {});
+    console.log('addStep for ', params.tripId);
+    const res = await axios.post(`/api/trips/${params.tripId}/steps`, {});
     console.log(res);
-    getUserTrip(match.params.tripId);
+    getUserTrip(params.tripId);
   };
 
   const onDeleteStep = async (stepId) => {
-    await axios.delete(`/api/trips/${match.params.tripId}/steps/${stepId}`);
-    getUserTrip(match.params.tripId);
+    await axios.delete(`/api/trips/${params.tripId}/steps/${stepId}`);
+    getUserTrip(params.tripId);
   };
 
   const toggleEditStep = (stepId) => {
@@ -145,7 +159,7 @@ const Trip = ({
           <MapContainer
             center={positions[0]}
             zoom={12}
-            style={{ height: '400px' }}
+            style={{ height: '400px', width: '600px' }}
           >
             <TileLayer
               url={`https://{s}.tile.jawg.io/jawg-terrain/{z}/{x}/{y}{r}.png?access-token=${jawgAccessToken}`}
@@ -168,21 +182,52 @@ const Trip = ({
   const getStep = (step) => {
     if (!stepsBeingEdited.includes(step._id)) {
       return (
-        <Step key={step._id}>
-          <h3>{step.name}</h3>
-          <p>Description: {step.description}</p>
-          <p>Start Time: {step.startTime}</p>
-          <p>End Time: {step.endTime}</p>
-          <p>Travel Mode: {step.travelMode}</p>
+        <VStack
+          minWidth="600px"
+          m="24px 0"
+          p="24px"
+          borderRadius="10px"
+          boxShadow="0px 0px 30px 2px rgba(94, 94, 94, 0.22)"
+          align="start"
+          key={step._id}
+        >
+          <Heading size="lg">{step.name}</Heading>
+          <Box>
+            <Text fontWeight="bold">Description</Text>
+            <Text whiteSpace="pre">{step.description}</Text>
+          </Box>
+          <Box>
+            <Text fontWeight="bold">Start Time</Text>
+            <Text>{step.startTime}</Text>
+          </Box>
+          <Box>
+            <Text fontWeight="bold">End Time</Text>
+            <Text>{step.endTime}</Text>
+          </Box>
+          <Box>
+            <Text fontWeight="bold">Travel Mode</Text>
+            <Text>{step.travelMode}</Text>
+          </Box>
           {getMapForStep(step._id)}
-          <button onClick={(e) => toggleEditStep(step._id)}>Edit</button>
-        </Step>
+          <Button onClick={(e) => toggleEditStep(step._id)}>Edit</Button>
+        </VStack>
       );
     } else {
       // Editing step
       return (
-        <Step key={step._id}>
-          <input
+        <VStack
+          minWidth="600px"
+          m="24px 0"
+          p="24px"
+          borderRadius="10px"
+          boxShadow="0px 0px 30px 2px rgba(94, 94, 94, 0.22)"
+          align="start"
+          key={step._id}
+        >
+          <Input
+            size="lg"
+            fontSize="30px"
+            fontWeight="bold"
             type="text"
             name="name"
             value={step.name}
@@ -191,66 +236,106 @@ const Trip = ({
             data-form-type="other"
             placeholder="Step Name"
           />
-          <br />
-          <input
-            type="text"
-            name="description"
-            value={step.description}
-            onChange={(e) => onChangeStep(e, step)}
-            autoComplete="off"
-            data-form-type="other"
-            placeholder="Description"
-          />
-          <br />
-          <input
-            type="text"
-            name="startTime"
-            value={step.startTIme}
-            onChange={(e) => onChangeStep(e, step)}
-            placeholder="Start Time"
-          />
-          <input
-            type="text"
-            name="endTime"
-            value={step.endTime}
-            onChange={(e) => onChangeStep(e, step)}
-            placeholder="End Time"
-          />
-          <br />
-          <input
-            type="text"
-            name="travelMode"
-            value={step.travelMode}
-            onChange={(e) => onChangeStep(e, step)}
-            placeholder="Travel Mode"
-          />
-          <br />
-          <input
+          <Box w="100%">
+            <Text fontWeight="bold">Description</Text>
+            <Textarea
+              minH="150px"
+              type="text"
+              name="description"
+              value={step.description}
+              onChange={(e) => onChangeStep(e, step)}
+              autoComplete="off"
+              data-form-type="other"
+              placeholder="Description"
+            />
+          </Box>
+          <Box>
+            <Text fontWeight="bold">Start Time</Text>
+            <Input
+              type="text"
+              name="startTime"
+              value={step.startTIme}
+              onChange={(e) => onChangeStep(e, step)}
+              placeholder="Start Time"
+            />
+          </Box>
+          <Box>
+            <Text fontWeight="bold">End Time</Text>
+            <Input
+              type="text"
+              name="endTime"
+              value={step.endTime}
+              onChange={(e) => onChangeStep(e, step)}
+              placeholder="End Time"
+            />
+          </Box>
+          <Box>
+            <Text fontWeight="bold">Travel Mode</Text>
+            <Input
+              type="text"
+              name="travelMode"
+              value={step.travelMode}
+              onChange={(e) => onChangeStep(e, step)}
+              placeholder="Travel Mode"
+            />
+          </Box>
+          <Box w="300px">
+            <Select
+              value={step.travelMode}
+              options={[
+                {
+                  label: 'Manual',
+                  options: [
+                    { value: 'Walk', label: 'Walk' },
+                    { value: 'Run', label: 'Run' },
+                    { value: 'Hike', label: 'Hike' },
+                    { value: 'Bike', label: 'Bike' },
+                    { value: 'Swim', label: 'Swim' },
+                    { value: 'Climb', label: 'Climb' },
+                  ],
+                },
+                {
+                  label: 'Transit',
+                  options: [
+                    { value: 'Car', label: 'Car' },
+                    { value: 'Bus', label: 'Bus' },
+                    { value: 'Plane', label: 'Plane' },
+                    { value: 'Train', label: 'Train' },
+                  ],
+                },
+              ]}
+              onChange={(e) => onChangeTravelMode(e, step)}
+              placeholder="Select a Travel Mode"
+            />
+          </Box>
+          <Input
             type="file"
             onChange={(e) => {
               onFileChange(step._id, e);
             }}
             accept=".gpx"
           />
-          <button
+          <Button
             onClick={() => {
               onFileUpload(step._id);
               toggleEditStep(step._id);
             }}
           >
             Upload
-          </button>
-          <button
-            onClick={(e) => {
-              onSaveStep(step);
-              toggleEditStep(step._id);
-            }}
-          >
-            Save
-          </button>
-          <button onClick={(e) => onDeleteStep(step._id)}>Delete</button>
-          <button onClick={(e) => toggleEditStep(step._id)}>Cancel</button>
-        </Step>
+          </Button>
+          <HStack marginTop="24px !important">
+            <Button onClick={(e) => toggleEditStep(step._id)}>Cancel</Button>
+            <Button onClick={(e) => onDeleteStep(step._id)}>Delete</Button>
+            <Button
+              onClick={(e) => {
+                onSaveStep(step);
+                toggleEditStep(step._id);
+              }}
+            >
+              Save
+            </Button>
+          </HStack>
+        </VStack>
       );
     }
   };
@@ -268,21 +353,36 @@ const Trip = ({
   const onChangePackingList = async (e) => {
     const { value } = e;
     const newPackingLists = [...trip.packingLists];
-    const newPackingList = packingLists.find(
-      (packingList) => packingList._id === value
-    );
-    const existingPackingList = getUsersSelectedPackingList();
-    if (existingPackingList === null) {
-      // User has not selected a packing list
-      newPackingLists.push(newPackingList);
-    } else {
-      // Replace existing list with new one
+    if (!value) {
+      // Remove user's selected packing list
+      const existingPackingList = getUsersSelectedPackingList();
+      if (existingPackingList === null) {
+        return;
+      }
+
       const index = trip.packingLists.indexOf(
         trip.packingLists.find(
           (packingList) => packingList._id === existingPackingList.value
         )
       );
-      newPackingLists.splice(index, 1, newPackingList);
+      newPackingLists.splice(index, 1);
+    } else {
+      const newPackingList = packingLists.find(
+        (packingList) => packingList._id === value
+      );
+      const existingPackingList = getUsersSelectedPackingList();
+      if (existingPackingList === null) {
+        // User has not selected a packing list
+        newPackingLists.push(newPackingList);
+      } else {
+        // Replace existing list with new one
+        const index = trip.packingLists.indexOf(
+          trip.packingLists.find(
+            (packingList) => packingList._id === existingPackingList.value
+          )
+        );
+        newPackingLists.splice(index, 1, newPackingList);
+      }
     }
 
     const newTrip = { ...trip, packingLists: newPackingLists };
@@ -300,23 +400,27 @@ const Trip = ({
   return (
     <TripContainer>
       <Link to="/trips">
-        <FontAwesomeIcon icon={faArrowAltCircleLeft} size="2x" />
+        <CustomFontAwesomeIcon icon={faArrowAltCircleLeft} size="2x" />
       </Link>
       {trip !== null && (
-        <div>
+        <VStack
+          align="start"
+          spacing="24px"
+          // divider={<StackDivider borderColor="gray.200" />}
+        >
           <TripInfo trip={trip} />
-          <div>
-            <p>
-              <b>Links:</b>
-            </p>
-            <Links links={trip.links} tripId={match.params.tripId} />
-          </div>
-          <div>
-            <p>
-              <b>Packing Lists:</b>
-            </p>
+          <Box>
+            <Text fontWeight="bold" mb="10px">
+              Links
+            </Text>
+            <Links links={trip.links} tripId={params.tripId} />
+          </Box>
+          <Box minW="240px">
+            <Text fontWeight="bold" mb="10px">
+              Packing Lists
+            </Text>
             {/* Dropdown for selecting Packing List */}
-            <Dropdown
+            <Select
               value={getUsersSelectedPackingList()}
               options={packingLists.map((packingList) => ({
                 value: packingList._id,
@@ -325,12 +429,34 @@ const Trip = ({
               onChange={onChangePackingList}
               placeholder="Select a Packing List"
             />
-            {trip.packingLists.map((packingList) => (
-              <Link to={`/packing-lists/${packingList._id}`}>
-                {packingList.name}
-              </Link>
-            ))}
-          </div>
+            <VStack mt="10px" alignItems="start">
+              {trip.packingLists.map((packingList) => (
+                <Box
+                  padding="8px 8px 8px 16px"
+                  backgroundColor="#EEEEEE"
+                  boxShadow="0px 0px 30px 2px rgba(94, 94, 94, 0.22)"
+                  borderRadius="8px"
+                  w="100%"
+                  key={packingList._id}
+                  _hover={{ backgroundColor: '#dd6b20', color: 'white' }}
+                >
+                  <Link
+                    _hover={{ textDecoration: 'none' }}
+                    fontWeight="semibold"
+                    width="100%"
+                    display="inline-block"
+                    href={`/packing-lists/${packingList._id}`}
+                  >
+                    <Box display="inline-block" width="90%">
+                      {packingList.name}
+                    </Box>{' '}
+                    <ChevronRightIcon />
+                  </Link>
+                </Box>
+              ))}
+            </VStack>
+          </Box>
+          <ShareModal trip={trip} getUserTrip={getUserTrip} />
           <div>
             {/* Steps */}
             {trip.steps.map((step) => {
@@ -340,7 +466,7 @@ const Trip = ({
 
             {JSON.stringify()}
           </div>
-        </div>
+        </VStack>
       )}
     </TripContainer>
   );

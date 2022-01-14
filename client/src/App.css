@@ -1,11 +1,14 @@
 /* Global Styles */
 :root {
-  --primary-color: #d4a373;
-  --secondary-color: #558b70;
+  --primary-color: #f7f4f1;
+  --secondary-color: #8d8741;
   --dark-color: #182b32;
   --light-color: #f4f4f4;
   --danger-color: #dc3545;
   --success-color: #28a745;
+  --text-color: #314643;
+  /* TODO: Change link color */
+  --link-color: #314643;
 }
 
 * {
@@ -18,12 +21,12 @@ body {
   font-family: 'Raleway', sans-serif;
   font-size: 1rem;
   line-height: 1.6;
-  background-color: #fefff6;
-  color: #333;
+  background-color: #fff;
+  color: var(--text-color);
 }
 
 a {
-  color: var(--primary-color);
+  color: var(--link-color);
   text-decoration: none;
 }
 
@@ -75,11 +78,24 @@ input:focus {
 /* Utilities */
 .container {
   max-width: 1100px;
-  margin: auto;
-  overflow: hidden;
-  padding: 0 2rem;
-  margin-bottom: 3rem;
-  margin-left: 220px;
+  margin: 40px 40px 0 300px;
+  overflow: scroll;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  padding: 1rem 2rem;
+  background-color: #f7f6f4;
+  height: 92vh;
+  border-radius: 24px;
+  -webkit-box-shadow: 5px 5px 25px 2px rgba(94, 94, 94, 0.35);
+  box-shadow: 5px 5px 25px 2px rgba(94, 94, 94, 0.35);
+}
+
+.container::-webkit-scrollbar {
+  display: none;
+}
+
+.tox-tinymce {
+  border-radius: 8px !important;
 }
 
 /* Text Styles*/
