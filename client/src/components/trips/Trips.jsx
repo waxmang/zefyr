@@ -1,41 +1,83 @@
 import React, { useEffect } from 'react';
-import { Link, Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import {
+  Box,
+  VStack,
+  HStack,
+  Button,
+  Text,
+  Heading,
+  Link,
+} from '@chakra-ui/react';
+import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 import { connect, useDispatch } from 'react-redux';
+import axios from 'axios';
 
-import { getUserTrips } from '../../actions/trips';
+import { getUserTrips, deleteUserTrip } from '../../actions/trips';
 
 const TripsContainer = styled.div``;
 
-const Trips = ({ getUserTrips, trips: { trips } }) => {
+const Trips = ({ getUserTrips, deleteUserTrip, trips: { trips } }) => {
   useEffect(() => {
     getUserTrips();
   }, [getUserTrips]);
 
+  const onAddTrip = async () => {
+    await axios.post('/api/trips', { name: 'New Trip' });
+    getUserTrips();
+  };
+
+  const onDeleteTrip = async (tripId) => {
+    await deleteUserTrip(tripId);
+  };
+
   return (
-    <TripsContainer>
-      <h1>Trips</h1>
+    <Box>
+      <Heading fontSize="36px">Trips</Heading>
       {trips !== null && (
         // Trips section
-        <div>
+        <VStack mt="20px" align="start" spacing="20px">
           {trips.map((trip) => (
             // Single Trip
-            <div key={trip._id}>
-              <Link to={`/trips/${trip._id}`}>{trip.name}</Link>
-              <button>Delete</button>
-            </div>
+            <Box
+              backgroundColor="white"
+              borderRadius="16px"
+              boxShadow="0px 0px 30px 2px rgba(94, 94, 94, 0.22)"
+              w="500px"
+              p="10px"
+              key={trip._id}
+            >
+              <Link
+                fontWeight="bold"
+                display="inline-block"
+                w="90%"
+                href={`/trips/${trip._id}`}
+              >
+                {trip.name}
+              </Link>
+              <Button colorScheme="red" onClick={onDeleteTrip}>
+                <DeleteIcon />
+              </Button>
+            </Box>
           ))}
-          <button>Add Trip</button>
-        </div>
+          <Button colorScheme="green" onClick={onAddTrip}>
+            <HStack>
+              <AddIcon />
+              <Text>Trip</Text>
+            </HStack>
+          </Button>
+        </VStack>
       )}
       <Outlet />
-    </TripsContainer>
+    </Box>
   );
 };
 
 Trips.propTypes = {
   getUserTrips: PropTypes.func.isRequired,
+  deleteUserTrip: PropTypes.func.isRequired,
   trips: PropTypes.object.isRequired,
 };
 
@@ -43,4 +85,6 @@ const mapStateToProps = (state) => ({
   trips: state.trips,
 });
 
-export default connect(mapStateToProps, { getUserTrips })(Trips);
+export default connect(mapStateToProps, { getUserTrips, deleteUserTrip })(
+  Trips
+);

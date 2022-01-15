@@ -1,7 +1,6 @@
-import React, { Fragment, useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowAltCircleLeft } from '@fortawesome/free-solid-svg-icons';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, connect } from 'react-redux';
+import moment from 'moment';
 import styled from 'styled-components';
 import {
   Box,
@@ -12,11 +11,18 @@ import {
   Text,
   Textarea,
   Heading,
-  StackDivider,
   Link,
 } from '@chakra-ui/react';
-import { ChevronRightIcon } from '@chakra-ui/icons';
+import {
+  AddIcon,
+  ArrowBackIcon,
+  ChevronRightIcon,
+  CloseIcon,
+  CheckIcon,
+  DeleteIcon,
+} from '@chakra-ui/icons';
 import { Select } from 'chakra-react-select';
+import DatePicker from '../date-picker/DatePicker';
 import { useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import axios from 'axios';
@@ -33,17 +39,7 @@ import TripInfo from './TripInfo';
 import ShareModal from './ShareModal';
 
 const TripContainer = styled.div`
-  margin-top: 32px;
-`;
-
-const Step = styled.div`
-  border: solid 1px black;
-  border-radius: 8px;
-  padding: 8px;
-`;
-
-const CustomFontAwesomeIcon = styled(FontAwesomeIcon)`
-  margin-bottom: 16px;
+  margin-top: 5px;
 `;
 
 const jawgAccessToken =
@@ -111,6 +107,22 @@ const Trip = ({
     });
   };
 
+  const onChangeStartTime = (startTime, step) => {
+    const newStep = { ...step, startTime: startTime };
+    dispatch({
+      type: EDIT_STEP,
+      payload: { step: newStep },
+    });
+  };
+
+  const onChangeEndTime = (endTime, step) => {
+    const newStep = { ...step, endTime: endTime };
+    dispatch({
+      type: EDIT_STEP,
+      payload: { step: newStep },
+    });
+  };
+
   const onChangeTravelMode = (e, step) => {};
 
   const onSaveStep = async (step) => {
@@ -120,9 +132,7 @@ const Trip = ({
   };
 
   const onAddStep = async () => {
-    console.log('addStep for ', params.tripId);
     const res = await axios.post(`/api/trips/${params.tripId}/steps`, {});
-    console.log(res);
     getUserTrip(params.tripId);
   };
 
@@ -159,7 +169,7 @@ const Trip = ({
           <MapContainer
             center={positions[0]}
             zoom={12}
-            style={{ height: '400px', width: '600px' }}
+            style={{ height: '400px', width: '700px' }}
           >
             <TileLayer
               url={`https://{s}.tile.jawg.io/jawg-terrain/{z}/{x}/{y}{r}.png?access-token=${jawgAccessToken}`}
@@ -175,7 +185,7 @@ const Trip = ({
         return <div>Map goes here</div>;
       }
     } else {
-      return <p>No map uploaded</p>;
+      return <Text>No map uploaded</Text>;
     }
   };
 
@@ -183,7 +193,7 @@ const Trip = ({
     if (!stepsBeingEdited.includes(step._id)) {
       return (
         <VStack
-          minWidth="600px"
+          minWidth="700px"
           m="24px 0"
           p="24px"
           borderRadius="10px"
@@ -198,17 +208,22 @@ const Trip = ({
           </Box>
           <Box>
             <Text fontWeight="bold">Start Time</Text>
-            <Text>{step.startTime}</Text>
+            <Text>{moment(step.startTime).format('MM/d/yyyy h:mm A')}</Text>
           </Box>
           <Box>
             <Text fontWeight="bold">End Time</Text>
-            <Text>{step.endTime}</Text>
+            <Text>{moment(step.endTime).format('MM/d/yyyy h:mm A')}</Text>
           </Box>
           <Box>
             <Text fontWeight="bold">Travel Mode</Text>
             <Text>{step.travelMode}</Text>
           </Box>
-          {getMapForStep(step._id)}
+          <Box>
+            <Text mb="10px" fontWeight="bold">
+              Map
+            </Text>
+            {getMapForStep(step._id)}
+          </Box>
           <Button onClick={(e) => toggleEditStep(step._id)}>Edit</Button>
         </VStack>
       );
@@ -216,7 +231,7 @@ const Trip = ({
       // Editing step
       return (
         <VStack
-          minWidth="600px"
+          minWidth="700px"
           m="24px 0"
           p="24px"
           borderRadius="10px"
@@ -251,35 +266,26 @@ const Trip = ({
           </Box>
           <Box>
             <Text fontWeight="bold">Start Time</Text>
-            <Input
-              type="text"
-              name="startTime"
-              value={step.startTIme}
-              onChange={(e) => onChangeStep(e, step)}
-              placeholder="Start Time"
+            <DatePicker
+              selectedDate={moment(step.startTime).toDate()}
+              onChange={(date) => onChangeStartTime(date, step)}
+              showTimeSelect
+              dateFormat="MM/d/yyyy h:mm aa"
+              style={{ backgroundColor: 'white' }}
             />
           </Box>
           <Box>
             <Text fontWeight="bold">End Time</Text>
-            <Input
-              type="text"
-              name="endTime"
-              value={step.endTime}
-              onChange={(e) => onChangeStep(e, step)}
-              placeholder="End Time"
-            />
-          </Box>
-          <Box>
-            <Text fontWeight="bold">Travel Mode</Text>
-            <Input
-              type="text"
-              name="travelMode"
-              value={step.travelMode}
-              onChange={(e) => onChangeStep(e, step)}
-              placeholder="Travel Mode"
+            <DatePicker
+              selectedDate={moment(step.endTime).toDate()}
+              onChange={(date) => onChangeEndTime(date, step)}
+              showTimeSelect
+              dateFormat="MM/d/yyyy h:mm aa"
+              style={{ backgroundColor: 'white' }}
             />
           </Box>
           <Box w="300px">
+            <Text fontWeight="bold">Travel Mode</Text>
             <Select
               value={step.travelMode}
               options={[
@@ -308,13 +314,18 @@ const Trip = ({
               placeholder="Select a Travel Mode"
             />
           </Box>
-          <Input
-            type="file"
-            onChange={(e) => {
-              onFileChange(step._id, e);
-            }}
-            accept=".gpx"
-          />
+          <Box>
+            <Text fontWeight="bold">Map</Text>
+            <Input
+              paddingTop="10px"
+              height="50px"
+              type="file"
+              onChange={(e) => {
+                onFileChange(step._id, e);
+              }}
+              accept=".gpx"
+            />
+          </Box>
           <Button
             onClick={() => {
               onFileUpload(step._id);
@@ -324,15 +335,25 @@ const Trip = ({
             Upload
           </Button>
           <HStack marginTop="24px !important">
-            <Button onClick={(e) => toggleEditStep(step._id)}>Cancel</Button>
-            <Button onClick={(e) => onDeleteStep(step._id)}>Delete</Button>
             <Button
+              onClick={async (e) => {
+                await getUserTrip(params.tripId);
+                toggleEditStep(step._id);
+              }}
+            >
+              <CloseIcon mx="2px" />
+            </Button>
+            <Button colorScheme="red" onClick={(e) => onDeleteStep(step._id)}>
+              <DeleteIcon mx="2px" />
+            </Button>
+            <Button
+              colorScheme="green"
               onClick={(e) => {
                 onSaveStep(step);
                 toggleEditStep(step._id);
               }}
             >
-              Save
+              <CheckIcon mx="2px" />
             </Button>
           </HStack>
         </VStack>
@@ -341,6 +362,9 @@ const Trip = ({
   };
 
   const getUsersSelectedPackingList = () => {
+    if (user === null) {
+      return null;
+    }
     const packingList = trip.packingLists.find(
       (packingList) => packingList.user === user._id
     );
@@ -399,11 +423,15 @@ const Trip = ({
 
   return (
     <TripContainer>
-      <Link to="/trips">
-        <CustomFontAwesomeIcon icon={faArrowAltCircleLeft} size="2x" />
+      <Link href="/trips">
+        <HStack opacity={0.5}>
+          <ArrowBackIcon h="24px" w="24px" />
+          <Text fontWeight="semibold">Back</Text>
+        </HStack>
       </Link>
       {trip !== null && (
         <VStack
+          mt="20px"
           align="start"
           spacing="24px"
           // divider={<StackDivider borderColor="gray.200" />}
@@ -462,7 +490,12 @@ const Trip = ({
             {trip.steps.map((step) => {
               return getStep(step);
             })}
-            <button onClick={(e) => onAddStep()}>Add Step</button>
+            <Button colorScheme="green" onClick={(e) => onAddStep()}>
+              <HStack>
+                <AddIcon mx="2px" />
+                <Text fontWeight="bold">Step</Text>
+              </HStack>
+            </Button>
 
             {JSON.stringify()}
           </div>

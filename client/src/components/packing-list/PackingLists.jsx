@@ -1,14 +1,21 @@
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import {
+  Box,
+  VStack,
+  HStack,
+  Button,
+  Text,
+  Heading,
+  Link,
+} from '@chakra-ui/react';
+import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
+import { Outlet } from 'react-router-dom';
 import { connect, useDispatch } from 'react-redux';
 
 import { getPackingLists } from '../../actions/packingLists';
 import { EDIT_PACKING_LIST } from '../../actions/types';
 import axios from 'axios';
-
-const PackingListsContainer = styled.div``;
 
 const PackingLists = ({ getPackingLists, packingLists: { packingLists } }) => {
   const dispatch = useDispatch();
@@ -31,26 +38,42 @@ const PackingLists = ({ getPackingLists, packingLists: { packingLists } }) => {
   };
 
   return (
-    <PackingListsContainer>
-      <h1>Packing Lists</h1>
+    <Box>
+      <Heading fontSize="36px">Packing Lists</Heading>
       {packingLists !== null && (
-        // Trips section
-        <div>
+        <VStack mt="20px" align="start" spacing="20px">
           {packingLists.map((packingList) => (
-            // Single Trip
-            <div key={packingList._id}>
-              <Link to={`/packing-lists/${packingList._id}`}>
+            <Box
+              backgroundColor="white"
+              borderRadius="16px"
+              boxShadow="0px 0px 30px 2px rgba(94, 94, 94, 0.22)"
+              w="500px"
+              p="10px"
+              key={packingList._id}
+            >
+              <Link
+                fontWeight="bold"
+                display="inline-block"
+                w="90%"
+                href={`/packing-lists/${packingList._id}`}
+              >
                 {packingList.name}
               </Link>
-              <button onClick={() => onDeletePackingList(packingList._id)}>
-                Delete
-              </button>
-            </div>
+              <Button colorScheme="red" onClick={onDeletePackingList}>
+                <DeleteIcon />
+              </Button>
+            </Box>
           ))}
-          <button onClick={onAddPackingList}>Add Packing List</button>
-        </div>
+          <Button colorScheme="green" onClick={onAddPackingList}>
+            <HStack>
+              <AddIcon />
+              <Text>Packing List</Text>
+            </HStack>
+          </Button>
+        </VStack>
       )}
-    </PackingListsContainer>
+      <Outlet />
+    </Box>
   );
 };
 

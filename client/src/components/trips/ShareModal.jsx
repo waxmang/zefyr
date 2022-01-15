@@ -1,38 +1,45 @@
 import React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Checkbox from '@mui/material/Checkbox';
-import TextField from '@mui/material/TextField';
-import Paper from '@mui/material/Paper';
+import {
+  Box,
+  Input,
+  VStack,
+  HStack,
+  Button,
+  Text,
+  Checkbox,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+} from '@chakra-ui/react';
 import { useDispatch } from 'react-redux';
 import axios from 'axios';
 
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 800,
-  bgcolor: 'background.paper',
-  boxShadow: 24,
-  p: 4,
-};
+// const style = {
+//   position: 'absolute',
+//   top: '50%',
+//   left: '50%',
+//   transform: 'translate(-50%, -50%)',
+//   width: 800,
+//   bgcolor: 'background.paper',
+//   boxShadow: 24,
+//   p: 4,
+// };
 
 const ShareModal = ({ trip, getUserTrip }) => {
   const { sharedUsers } = trip;
-  const [open, setOpen] = React.useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [emailInput, setEmailInput] = React.useState('');
-
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
 
   const onToggleRead = async (email) => {
     const newSharedUsers = [...sharedUsers];
@@ -79,20 +86,59 @@ const ShareModal = ({ trip, getUserTrip }) => {
   };
 
   return (
-    <div>
-      {/* <Button onClick={handleOpen}>Sharing</Button> */}
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Sharing
-          </Typography>
+    <>
+      <Button onClick={onOpen}>Sharing</Button>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent minW="600px">
+          <ModalHeader>Sharing</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Table>
+              <Thead>
+                <Tr>
+                  <Th>Email</Th>
+                  <Th>Read</Th>
+                  <Th>Write</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {trip &&
+                  sharedUsers.map((sharedUser) => (
+                    <Tr key={sharedUser._id}>
+                      <Td>{sharedUser.email}</Td>
+                      <Td>
+                        <Checkbox
+                          onChange={() => onToggleRead(sharedUser.email)}
+                          isChecked={sharedUser.read}
+                        />
+                      </Td>
+                      <Td>
+                        <Checkbox
+                          onChange={() => onToggleWrite(sharedUser.email)}
+                          isChecked={sharedUser.write}
+                        />
+                      </Td>
+                    </Tr>
+                  ))}
+              </Tbody>
+            </Table>
+            <Box>
+              <Input
+                label="Email"
+                sx={{ m: 1, width: '25ch' }}
+                onChange={onChangeEmailInput}
+              />
+              <Button onClick={onAddUser}>Add User</Button>
+            </Box>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
           {/* Table for showing currently shared users */}
-          <TableContainer component={Paper}>
+          {/* <TableContainer component={Paper}>
             <Table sx={{ minWidth: 600 }} aria-label="sharing table">
               <TableHead>
                 <TableRow>
@@ -127,19 +173,10 @@ const ShareModal = ({ trip, getUserTrip }) => {
                   ))}
               </TableBody>
             </Table>
-          </TableContainer>
-          <div>
-            <TextField
-              label="Email"
-              id="outlined-start-adornment"
-              sx={{ m: 1, width: '25ch' }}
-              onChange={onChangeEmailInput}
-            />
-            {/* <Button onClick={onAddUser}>Add User</Button> */}
-          </div>
-        </Box>
+          </TableContainer> */}
+        </ModalContent>
       </Modal>
-    </div>
+    </>
   );
 };
 

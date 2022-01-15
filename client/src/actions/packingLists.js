@@ -59,3 +59,23 @@ export const togglePackingListItem = (packingList, itemToToggle) => async (
     },
   });
 };
+
+export const toggleAllPackingListItems = (
+  packingList,
+  allItems,
+  allItemsChecked
+) => async (dispatch) => {
+  let newItems = [];
+  if (!allItemsChecked) {
+    newItems = [...allItems];
+  }
+
+  const newPackingList = { ...packingList, items: newItems };
+
+  dispatch({
+    type: EDIT_PACKING_LIST,
+    payload: {
+      packingList: newPackingList,
+    },
+  });
+};

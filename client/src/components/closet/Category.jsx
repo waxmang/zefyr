@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
+import { Box, VStack, HStack, Button, Text, Input } from '@chakra-ui/react';
+import { DeleteIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
-import Button from 'react-bootstrap/Button';
 
 import { EDIT_CATEGORY, DELETE_CATEGORY } from '../../actions/types';
 import axios from 'axios';
@@ -37,8 +38,8 @@ const Category = ({ category }) => {
   };
 
   return (
-    <Container>
-      <input
+    <HStack>
+      <Input
         type="text"
         name="name"
         value={category.name}
@@ -47,10 +48,10 @@ const Category = ({ category }) => {
         data-form-type="other"
         placeholder="Category name"
       />
-      <Button variant="danger" onClick={onDelete}>
-        Delete category
+      <Button colorScheme="red" onClick={onDelete}>
+        <DeleteIcon />
       </Button>
-    </Container>
+    </HStack>
   );
 };
 

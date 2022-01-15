@@ -1,38 +1,32 @@
 import React from 'react';
+import {
+  Box,
+  VStack,
+  HStack,
+  Button,
+  Input,
+  Text,
+  Heading,
+  Link,
+} from '@chakra-ui/react';
 import { Droppable } from 'react-beautiful-dnd';
-import styled from 'styled-components';
 
 import Item from './Item';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const ItemsContainer = styled.div`
-  background-color: ${(props) =>
-    props.isDraggingOver ? 'green' : 'transparent'};
-  flex-grow: 1;
-  min-height: 20px;
-`;
-
 const Items = ({ items, categoryId }) => {
   return (
-    <Container>
+    <Box m="10px 0 10px 25px">
       <Droppable droppableId={categoryId + '-items'} type="items">
         {(provided, snapshot) => (
-          <ItemsContainer
-            ref={provided.innerRef}
-            isDraggingOver={snapshot.isDraggingOver}
-          >
+          <Box ref={provided.innerRef}>
             {items.map((item, index) => {
               return <Item item={item} index={index} key={item._id} />;
             })}
             {provided.placeholder}
-          </ItemsContainer>
+          </Box>
         )}
       </Droppable>
-    </Container>
+    </Box>
   );
 };
 

@@ -2,17 +2,7 @@ import React, { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGripLines } from '@fortawesome/free-solid-svg-icons';
-import {
-  HStack,
-  Button,
-  Input,
-  Grid,
-  GridItem,
-  Flex,
-  Spacer,
-  Box,
-  Link,
-} from '@chakra-ui/react';
+import { HStack, Button, Input, Flex, Box, Link } from '@chakra-ui/react';
 import {
   AddIcon,
   ExternalLinkIcon,
@@ -21,20 +11,11 @@ import {
   DeleteIcon,
   EditIcon,
 } from '@chakra-ui/icons';
-import { connect, useDispatch } from 'react-redux';
+import { connect } from 'react-redux';
 import axios from 'axios';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 
-import { EDIT_TRIP_LINKS } from '../../actions/types';
 import { getUserTrip, editLinks } from '../../actions/trips';
-
-const LinkContainer = styled.div`
-  border: 1px solid lightgrey;
-  border-radius: 4px;
-  padding: 4px 0 4px 8px;
-  margin: 4px 0;
-`;
 
 const Links = ({ links, tripId, editLinks, getUserTrip }) => {
   const [newLink, setNewLink] = useState({ name: '', url: '' });
@@ -138,7 +119,16 @@ const Links = ({ links, tripId, editLinks, getUserTrip }) => {
           index={links.indexOf(link)}
         >
           {(provided) => (
-            <LinkContainer ref={provided.innerRef} {...provided.draggableProps}>
+            <Box
+              backgroundColor="#EEEEEE"
+              boxShadow="2px 2px 30px 2px rgba(94, 94, 94, 0.22)"
+              borderRadius="8px"
+              mb="8px"
+              p="10px 10px 10px 16px"
+              w="700px"
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+            >
               <Flex>
                 <Box w="40px" display="flex" alignItems="center">
                   <span {...provided.dragHandleProps}>
@@ -161,50 +151,57 @@ const Links = ({ links, tripId, editLinks, getUserTrip }) => {
                   </Button>
                 </Box>
               </Flex>
-            </LinkContainer>
+            </Box>
           )}
         </Draggable>
       );
     } else {
       return (
-        // <LinkContainer key={link}>
-        <HStack key={link._id} p="4px" m="5px">
-          <Input
-            maxW="250px"
-            type="text"
-            name="name"
-            value={linksBeingEdited[index].newLink.name}
-            onChange={(e) => onChangeLink(e, index)}
-            autoComplete="off"
-            data-form-type="other"
-          />
-          <Input
-            maxW="250px"
-            type="text"
-            name="url"
-            value={linksBeingEdited[index].newLink.url}
-            onChange={(e) => onChangeLink(e, index)}
-            autoComplete="off"
-            data-form-type="other"
-          />
-          <Button width="120px" onClick={() => onToggleEdit(link)}>
-            <CloseIcon mx="2px" />
-          </Button>
+        <Box
+          backgroundColor="#EEEEEE"
+          boxShadow="2px 2px 30px 2px rgba(94, 94, 94, 0.22)"
+          borderRadius="8px"
+          mb="8px"
+          p="10px 10px 10px 16px"
+          key={link._id}
+        >
+          <HStack>
+            <Input
+              maxW="250px"
+              type="text"
+              name="name"
+              value={linksBeingEdited[index].newLink.name}
+              onChange={(e) => onChangeLink(e, index)}
+              autoComplete="off"
+              data-form-type="other"
+            />
+            <Input
+              maxW="250px"
+              type="text"
+              name="url"
+              value={linksBeingEdited[index].newLink.url}
+              onChange={(e) => onChangeLink(e, index)}
+              autoComplete="off"
+              data-form-type="other"
+            />
+            <Button width="120px" onClick={() => onToggleEdit(link)}>
+              <CloseIcon mx="2px" />
+            </Button>
 
-          <Button colorScheme="red" onClick={() => onDeleteLink(index)}>
-            <DeleteIcon mx="2px" />
-          </Button>
-          <Button
-            colorScheme="green"
-            onClick={() => {
-              onSaveLink(index);
-              onToggleEdit(link);
-            }}
-          >
-            <CheckIcon mx="2px" />
-          </Button>
-        </HStack>
-        // </LinkContainer>
+            <Button colorScheme="red" onClick={() => onDeleteLink(index)}>
+              <DeleteIcon mx="2px" />
+            </Button>
+            <Button
+              colorScheme="green"
+              onClick={() => {
+                onSaveLink(index);
+                onToggleEdit(link);
+              }}
+            >
+              <CheckIcon mx="2px" />
+            </Button>
+          </HStack>
+        </Box>
       );
     }
   };
@@ -237,7 +234,7 @@ const Links = ({ links, tripId, editLinks, getUserTrip }) => {
             value={newLink.url}
             onChange={onChangeNewLink}
           />
-          <Button onClick={onAddLink}>
+          <Button colorScheme="green" onClick={onAddLink}>
             <AddIcon mx="2px" />
           </Button>
         </HStack>
