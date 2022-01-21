@@ -59,6 +59,9 @@ const PackingList = ({
   }, [getCurrentUserCategories, getCurrentCloset, getPackingList]);
 
   useEffect(() => {
+    if (categories === null) {
+      return;
+    }
     const newCategoriesMap = {};
 
     categories.forEach((category) => {
@@ -151,15 +154,17 @@ const PackingList = ({
   ) : (
     <PackingListContainer>
       {getPackingListInfo()}
-      <Button mt="15px" onClick={onClickEdit}>
-        {packingListBeingEdited ? 'Done' : 'Edit'}
-      </Button>
+      {closet.user === packingList.user && (
+        <Button mt="15px" onClick={onClickEdit}>
+          {packingListBeingEdited ? 'Done' : 'Edit'}
+        </Button>
+      )}
 
       <Table mt="20px">
         <Thead>
           <Tr>
             {packingListBeingEdited && (
-              <Th w="20px">
+              <Th>
                 <Checkbox
                   isChecked={allItemsChecked}
                   isIndeterminate={isIndeterminate}
@@ -186,7 +191,7 @@ const PackingList = ({
                 (!packingListBeingEdited && isItemInPackingList(item))) && (
                 <Tr key={item._id}>
                   {packingListBeingEdited && (
-                    <Td w="20px">
+                    <Td>
                       <Checkbox
                         onChange={(e) => onRowClick(e, item)}
                         isChecked={isItemInPackingList(item)}
@@ -204,49 +209,6 @@ const PackingList = ({
           <Tr></Tr>
         </Tbody>
       </Table>
-
-      {/* <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="packing-list table">
-          <TableHead>
-            <TableRow>
-              {packingListBeingEdited && <Checkbox />}
-              <TableCell>Name</TableCell>
-              <TableCell align="right">Description</TableCell>
-              <TableCell align="right">Category</TableCell>
-              <TableCell align="right">Weight (oz)</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {allItems.map((item) => {
-              return (
-                (packingListBeingEdited ||
-                  (!packingListBeingEdited && isItemInPackingList(item))) && (
-                  <TableRow
-                    key={item._id}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                    hover
-                    role="checkbox"
-                    onClick={(e) => onRowClick(e, item)}
-                    selected={isItemInPackingList(item)}
-                  >
-                    {packingListBeingEdited && (
-                      <TableCell padding="checkbox">
-                        <Checkbox checked={isItemInPackingList(item)} />
-                      </TableCell>
-                    )}
-                    <TableCell component="th" scope="row">
-                      {item.name}
-                    </TableCell>
-                    <TableCell align="right">{item.description}</TableCell>
-                    <TableCell align="right">{item.category}</TableCell>
-                    <TableCell align="right">{item.weight}</TableCell>
-                  </TableRow>
-                )
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer> */}
     </PackingListContainer>
   );
 };

@@ -18,7 +18,6 @@ router.post('/', jwtAuth, async (req, res) => {
 
   try {
     const trip = await Trip.findById(tripId);
-    console.log(trip);
 
     if (
       !(
@@ -139,7 +138,6 @@ router.put(
 
       const gpxFile = req.file;
       const blobName = `${gpxFile.originalname}${new Date().toISOString()}`;
-      // console.log('blobName', blobName);
 
       try {
         const blockBlobClient = containerClient.getBlockBlobClient(blobName);
@@ -188,7 +186,6 @@ router.get('/:stepId/gpx', jwtAuth, async (req, res) => {
     }
 
     const { gpxFilename, gpxHash } = step;
-    // console.log(step);
 
     try {
       const { contentMD5, fileContents } = await azureStorage.downloadFile(

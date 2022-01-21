@@ -20,7 +20,6 @@ router.post(
     check('password', 'Password is required').isLength({ min: 6 }),
   ],
   async (req, res) => {
-    console.log(req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -86,7 +85,6 @@ router.post(
 // @access  Public
 router.get('/', async (req, res) => {
   const { email } = req.query;
-  console.log(email);
   try {
     const user = await User.findOne({ email: email });
 

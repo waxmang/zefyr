@@ -9,10 +9,6 @@ import { Editor } from '@tinymce/tinymce-react';
 
 import { EDIT_TRIP } from '../../actions/types';
 
-const DateTimePickerContainer = styled.div`
-  margin-bottom: 20px !important;
-`;
-
 const CustomEditor = styled(Editor)`
   margin-top: 10px !important;
 `;
@@ -141,7 +137,11 @@ const TripInfo = ({ trip }) => {
           <VStack align="start">
             <Text fontWeight="bold">Start Time</Text>
             <DatePicker
-              selectedDate={moment(tripInfoEditHistory.new.startDate).toDate()}
+              selectedDate={
+                tripInfoEditHistory.new.startDate
+                  ? moment(tripInfoEditHistory.new.startDate).toDate()
+                  : null
+              }
               onChange={onChangeStartDate}
               readOnly={!tripInfoBeingEdited}
               showTimeSelect
@@ -152,7 +152,11 @@ const TripInfo = ({ trip }) => {
           <VStack align="start">
             <Text fontWeight="bold">End Time</Text>
             <DatePicker
-              selectedDate={moment(tripInfoEditHistory.new.endDate).toDate()}
+              selectedDate={
+                tripInfoEditHistory.new.endDate
+                  ? moment(tripInfoEditHistory.new.endDate).toDate()
+                  : null
+              }
               onChange={onChangeEndDate}
               readOnly={!tripInfoBeingEdited}
               showTimeSelect

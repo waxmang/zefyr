@@ -42,8 +42,7 @@ const TripContainer = styled.div`
   margin-top: 5px;
 `;
 
-const jawgAccessToken =
-  'wFM7G4Sb88GGSS2VLoo2cY2IGkIo8IPkcbwuXgvnzjwJYl9x8qBPUIAP7URH112a';
+const jawgAccessToken = process.env.REACT_APP_JAWG_ACCESS_TOKEN;
 
 const Trip = ({
   trips: { trip, gpxFiles },
@@ -123,7 +122,13 @@ const Trip = ({
     });
   };
 
-  const onChangeTravelMode = (e, step) => {};
+  const onChangeTravelMode = (e, step) => {
+    const newStep = { ...step, travelMode: e.value };
+    dispatch({
+      type: EDIT_STEP,
+      payload: { step: newStep },
+    });
+  };
 
   const onSaveStep = async (step) => {
     const newStep = { ...step };
@@ -240,6 +245,7 @@ const Trip = ({
           key={step._id}
         >
           <Input
+            backgroundColor="white"
             size="lg"
             fontSize="30px"
             fontWeight="bold"
@@ -254,6 +260,7 @@ const Trip = ({
           <Box w="100%">
             <Text fontWeight="bold">Description</Text>
             <Textarea
+              backgroundColor="white"
               minH="150px"
               type="text"
               name="description"
@@ -287,7 +294,9 @@ const Trip = ({
           <Box w="300px">
             <Text fontWeight="bold">Travel Mode</Text>
             <Select
-              value={step.travelMode}
+              className="dropdown"
+              classNamePrefix="dropdown"
+              value={{ value: step.travelMode, label: step.travelMode }}
               options={[
                 {
                   label: 'Manual',
@@ -295,6 +304,7 @@ const Trip = ({
                     { value: 'Walk', label: 'Walk' },
                     { value: 'Run', label: 'Run' },
                     { value: 'Hike', label: 'Hike' },
+                    { value: 'Ski', label: 'Ski' },
                     { value: 'Bike', label: 'Bike' },
                     { value: 'Swim', label: 'Swim' },
                     { value: 'Climb', label: 'Climb' },
@@ -317,6 +327,7 @@ const Trip = ({
           <Box>
             <Text fontWeight="bold">Map</Text>
             <Input
+              backgroundColor="white"
               paddingTop="10px"
               height="50px"
               type="file"
@@ -429,7 +440,7 @@ const Trip = ({
           <Text fontWeight="semibold">Back</Text>
         </HStack>
       </Link>
-      {trip !== null && (
+      {trip !== null && packingLists !== null && (
         <VStack
           mt="20px"
           align="start"
@@ -449,6 +460,8 @@ const Trip = ({
             </Text>
             {/* Dropdown for selecting Packing List */}
             <Select
+              className="dropdown"
+              classNamePrefix="dropdown"
               value={getUsersSelectedPackingList()}
               options={packingLists.map((packingList) => ({
                 value: packingList._id,

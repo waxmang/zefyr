@@ -11,6 +11,8 @@ import {
   faSignOutAlt,
   faMap,
   faClipboardList,
+  faUserPlus,
+  faSignInAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import styled, { css } from 'styled-components';
 
@@ -111,12 +113,22 @@ const Navbar = ({ auth: { isAuthenticated, loading }, logout }) => {
     <ul>
       <li>
         <LinkContainer>
-          <Link to="/register">Register</Link>
+          <CustomLink to="/login" active={urlPath.startsWith('/login')}>
+            <IconContainer>
+              <FontAwesomeIcon icon={faSignInAlt} />
+            </IconContainer>{' '}
+            <span className="hide-sm">Sign In</span>
+          </CustomLink>
         </LinkContainer>
       </li>
       <li>
         <LinkContainer>
-          <Link to="/login">Login</Link>
+          <CustomLink to="/register" active={urlPath.startsWith('/register')}>
+            <IconContainer>
+              <FontAwesomeIcon icon={faUserPlus} />
+            </IconContainer>{' '}
+            <span className="hide-sm">Register</span>
+          </CustomLink>
         </LinkContainer>
       </li>
     </ul>
@@ -132,7 +144,7 @@ const Navbar = ({ auth: { isAuthenticated, loading }, logout }) => {
               style={{ color: '#318E87' }}
               size="2x"
             />{' '}
-            <Text fontSize="3xl">Zephyr</Text>
+            <Text fontSize="3xl">Zefyr</Text>
           </HStack>
         </Link>
         {!loading && (

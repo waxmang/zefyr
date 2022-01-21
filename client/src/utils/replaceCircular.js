@@ -2,7 +2,6 @@ const replaceCircular = function (val, cache) {
   cache = cache || new WeakSet();
 
   if (val && typeof val == 'object') {
-    console.log(val);
     if (cache.has(val)) return '[Circular]';
 
     cache.add(val);

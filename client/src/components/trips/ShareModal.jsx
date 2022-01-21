@@ -2,10 +2,7 @@ import React from 'react';
 import {
   Box,
   Input,
-  VStack,
-  HStack,
   Button,
-  Text,
   Checkbox,
   Table,
   Thead,
@@ -21,20 +18,11 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
+  Radio,
+  RadioGroup,
 } from '@chakra-ui/react';
 import { useDispatch } from 'react-redux';
 import axios from 'axios';
-
-// const style = {
-//   position: 'absolute',
-//   top: '50%',
-//   left: '50%',
-//   transform: 'translate(-50%, -50%)',
-//   width: 800,
-//   bgcolor: 'background.paper',
-//   boxShadow: 24,
-//   p: 4,
-// };
 
 const ShareModal = ({ trip, getUserTrip }) => {
   const { sharedUsers } = trip;
@@ -74,7 +62,6 @@ const ShareModal = ({ trip, getUserTrip }) => {
   };
 
   const onAddUser = async () => {
-    console.log('onAddUser');
     const newSharedUsers = [
       ...sharedUsers,
       { email: emailInput, read: true, write: false },
@@ -137,43 +124,6 @@ const ShareModal = ({ trip, getUserTrip }) => {
               Close
             </Button>
           </ModalFooter>
-          {/* Table for showing currently shared users */}
-          {/* <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 600 }} aria-label="sharing table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Email</TableCell>
-                  <TableCell align="right">Read</TableCell>
-                  <TableCell align="right">Write</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {trip &&
-                  sharedUsers.map((sharedUser) => (
-                    <TableRow
-                      key={sharedUser._id}
-                      sx={{
-                        '&:last-child td, &:last-child th': { padding: 2 },
-                      }}
-                    >
-                      <TableCell>{sharedUser.email}</TableCell>
-                      <TableCell
-                        padding="checkbox"
-                        onClick={() => onToggleRead(sharedUser.email)}
-                      >
-                        <Checkbox checked={sharedUser.read} />
-                      </TableCell>
-                      <TableCell
-                        padding="checkbox"
-                        onClick={() => onToggleWrite(sharedUser.email)}
-                      >
-                        <Checkbox checked={sharedUser.write} />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </TableContainer> */}
         </ModalContent>
       </Modal>
     </>

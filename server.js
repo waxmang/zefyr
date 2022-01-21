@@ -13,9 +13,10 @@ connectToDb();
 // app.use(formidableMiddleware());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ extended: false }));
+app.use(express.static('./client/build'));
 
 app.get('/', (req, res) => {
-	res.send('API Running');
+  res.send('API Running');
 });
 
 app.use('/api/users', require('./routes/api/users'));

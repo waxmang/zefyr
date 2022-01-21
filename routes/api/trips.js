@@ -6,7 +6,6 @@ const Trip = require('../../models/trip/Trip');
 const PackingList = require('../../models/closet/PackingList');
 const jwtAuth = require('../../middleware/jwtAuth');
 const itemRouter = require('./steps');
-// console.log(TEST);
 
 const router = express.Router();
 
@@ -56,7 +55,7 @@ router.put('/:tripId', jwtAuth, async (req, res) => {
     const oldTrip = await Trip.findById(tripId);
 
     const hasEditPermission = oldTrip.sharedUsers.find(
-      (sharedUser) => sharedUser.email === req.user.email && sharedUser.edit
+      (sharedUser) => sharedUser.email === req.user.email && sharedUser.write
     );
 
     // Check if user has edit permissions
@@ -99,7 +98,7 @@ router.put('/:tripId', jwtAuth, async (req, res) => {
 router.get('/', jwtAuth, async (req, res) => {
   try {
     const trips = await Trip.find({
-      $or: [{ user: req.user.id }, { sharedReadUsers: { $in: [req.user.id] } }],
+      $or: [{ user: req.user.id }, { 'sharedUsers.email': req.user.email }],
     });
 
     res.json(trips);

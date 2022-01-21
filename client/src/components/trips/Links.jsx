@@ -221,6 +221,7 @@ const Links = ({ links, tripId, editLinks, getUserTrip }) => {
         </Droppable>
         <HStack mt="20px">
           <Input
+            backgroundColor="white"
             type="text"
             name="name"
             placeholder="Link Name"
@@ -228,6 +229,7 @@ const Links = ({ links, tripId, editLinks, getUserTrip }) => {
             onChange={onChangeNewLink}
           />
           <Input
+            backgroundColor="white"
             type="text"
             name="url"
             placeholder="URL"

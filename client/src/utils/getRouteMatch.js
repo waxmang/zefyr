@@ -13,7 +13,6 @@ const getRouteMatch = async (coordinates, radius, profile) => {
     { method: 'GET' }
   );
   const response = await query.json();
-  console.log(response);
   // Handle errors
   if (response.code !== 'Ok') {
     return;
