@@ -16,7 +16,6 @@ import Trip from './components/trips/Trip';
 import PrivateRoute from './components/routing/PrivateRoute';
 import 'sanitize.css';
 import './App.css';
-import background from './mtn_bg_trans1.png';
 
 // Redux
 import { Provider } from 'react-redux';
