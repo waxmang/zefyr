@@ -18,10 +18,7 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  Radio,
-  RadioGroup,
 } from '@chakra-ui/react';
-import { useDispatch } from 'react-redux';
 import axios from 'axios';
 
 const ShareModal = ({ trip, getUserTrip }) => {

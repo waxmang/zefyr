@@ -31,7 +31,7 @@ import 'leaflet/dist/leaflet.css';
 import { MapContainer, Polyline, TileLayer } from 'react-leaflet';
 import 'react-dropdown/style.css';
 
-import { DELETE_STEP, EDIT_STEP, EDIT_TRIP } from '../../actions/types';
+import { EDIT_STEP, EDIT_TRIP } from '../../actions/types';
 import { getUserTrip } from '../../actions/trips';
 import { getPackingLists } from '../../actions/packingLists';
 import Links from './Links';
@@ -137,7 +137,7 @@ const Trip = ({
   };
 
   const onAddStep = async () => {
-    const res = await axios.post(`/api/trips/${params.tripId}/steps`, {});
+    await axios.post(`/api/trips/${params.tripId}/steps`, {});
     getUserTrip(params.tripId);
   };
 

@@ -11,13 +11,10 @@ import {
   Link,
 } from '@chakra-ui/react';
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
-import styled from 'styled-components';
-import { connect, useDispatch } from 'react-redux';
+import { connect } from 'react-redux';
 import axios from 'axios';
 
 import { getUserTrips, deleteUserTrip } from '../../actions/trips';
-
-const TripsContainer = styled.div``;
 
 const Trips = ({ getUserTrips, deleteUserTrip, trips: { trips } }) => {
   useEffect(() => {

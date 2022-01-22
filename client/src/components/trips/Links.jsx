@@ -88,7 +88,7 @@ const Links = ({ links, tripId, editLinks, getUserTrip }) => {
   };
 
   const assurePrefix = (url) => {
-    return url.match(/^.{3,5}\:\/\//) ? url : `//${url}`;
+    return url.match(/^.{3,5}\/\//) ? url : `//${url}`;
   };
 
   const onChangeLink = (e, index) => {

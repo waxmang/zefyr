@@ -1,15 +1,7 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
-import {
-  Box,
-  VStack,
-  HStack,
-  Button,
-  Text,
-  Heading,
-  Link,
-} from '@chakra-ui/react';
+import { Box, HStack, Button, Text, Heading } from '@chakra-ui/react';
 import { AddIcon, DragHandleIcon } from '@chakra-ui/icons';
 import { connect, useDispatch } from 'react-redux';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';

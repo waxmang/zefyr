@@ -1,13 +1,10 @@
 import React, { useEffect } from 'react';
-import { Box, VStack, HStack, Button, Text, Input } from '@chakra-ui/react';
+import { HStack, Button, Input } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
-import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 
 import { EDIT_CATEGORY, DELETE_CATEGORY } from '../../actions/types';
 import axios from 'axios';
-
-const Container = styled.div``;
 
 const Category = ({ category }) => {
   const dispatch = useDispatch();

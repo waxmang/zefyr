@@ -1,8 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import {
-  Box,
   VStack,
-  HStack,
   Button,
   Input,
   Text,
@@ -11,7 +9,6 @@ import {
   FormControl,
   FormLabel,
   FormErrorMessage,
-  FormHelperText,
 } from '@chakra-ui/react';
 import { Formik, Form, Field } from 'formik';
 import { Navigate } from 'react-router-dom';
@@ -37,12 +34,6 @@ const Login = ({ login, isAuthenticated }) => {
       return 'Invalid email address';
     }
     return null;
-  };
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-
-    login({ email, password });
   };
 
   // Redirect if logged in

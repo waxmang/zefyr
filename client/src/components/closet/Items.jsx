@@ -1,14 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  VStack,
-  HStack,
-  Button,
-  Input,
-  Text,
-  Heading,
-  Link,
-} from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import { Droppable } from 'react-beautiful-dnd';
 
 import Item from './Item';

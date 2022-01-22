@@ -4,7 +4,6 @@ import {
   GET_PACKING_LISTS,
   GET_PACKING_LIST,
   EDIT_PACKING_LIST,
-  DELETE_PACKING_LIST,
 } from './types';
 
 export const getPackingLists = () => async (dispatch) => {

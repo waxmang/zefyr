@@ -1,4 +1,4 @@
-import React, { HTMLAttributes } from 'react';
+import React from 'react';
 import ReactDatePicker from 'react-datepicker';
 import { useColorMode } from '@chakra-ui/react';
 

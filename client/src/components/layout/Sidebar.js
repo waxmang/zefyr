@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { VStack, HStack, Button, Text } from '@chakra-ui/react';
+import { HStack, Text } from '@chakra-ui/react';
 import PropTypes from 'prop-types';
 import { logout } from '../../actions/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

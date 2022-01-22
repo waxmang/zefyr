@@ -14,12 +14,9 @@ import { Outlet } from 'react-router-dom';
 import { connect, useDispatch } from 'react-redux';
 
 import { getPackingLists } from '../../actions/packingLists';
-import { EDIT_PACKING_LIST } from '../../actions/types';
 import axios from 'axios';
 
 const PackingLists = ({ getPackingLists, packingLists: { packingLists } }) => {
-  const dispatch = useDispatch();
-
   useEffect(() => {
     getPackingLists();
   }, [getPackingLists]);

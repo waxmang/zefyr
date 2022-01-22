@@ -3,10 +3,7 @@ import axios from 'axios';
 import {
   Box,
   Input,
-  VStack,
-  HStack,
   Button,
-  Text,
   Checkbox,
   Heading,
   Table,
@@ -56,7 +53,12 @@ const PackingList = ({
     getCurrentUserCategories();
     getCurrentCloset(); // Not sure if we need this
     getPackingList(params.packingListId);
-  }, [getCurrentUserCategories, getCurrentCloset, getPackingList]);
+  }, [
+    getCurrentUserCategories,
+    getCurrentCloset,
+    getPackingList,
+    params.packingListId,
+  ]);
 
   useEffect(() => {
     if (categories === null) {
@@ -139,10 +141,6 @@ const PackingList = ({
         </Box>
       );
     }
-  };
-
-  const getCategoryName = (categoryId) => {
-    const category = category;
   };
 
   return (loadingCloset || loadingCategories || loadingPackingList) &&

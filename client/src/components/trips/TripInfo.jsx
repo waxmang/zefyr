@@ -87,10 +87,6 @@ const TripInfo = ({ trip }) => {
 
   const onSaveTripInfo = async () => {
     // Update Redux state with new trip info properties
-    const newTripInfo = {
-      ...tripInfoEditHistory.new,
-      description: JSON.stringify(tripInfoEditHistory.new.description),
-    };
     await axios.put(`/api/trips/${trip._id}`, tripInfoEditHistory.new);
 
     const res = await axios.get(`/api/trips/${trip._id}`);

@@ -1,28 +1,16 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
-import {
-  Box,
-  VStack,
-  HStack,
-  Button,
-  Input,
-  Text,
-  Heading,
-  Link,
-} from '@chakra-ui/react';
+import { Box, HStack, Button, Input } from '@chakra-ui/react';
 import { DragHandleIcon, DeleteIcon } from '@chakra-ui/icons';
 import { Select } from 'chakra-react-select';
 import { useDispatch } from 'react-redux';
-import Dropdown from 'react-dropdown';
 import { Draggable } from 'react-beautiful-dnd';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGripLines, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 import { DELETE_ITEM, EDIT_ITEM } from '../../actions/types';
 
 const Item = ({ item, index }) => {
   const dispatch = useDispatch();
-  const { _id, name, description, weight, unit } = item;
+  const { name, description, weight, unit } = item;
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {

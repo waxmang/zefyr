@@ -6,7 +6,6 @@ import {
   EDIT_TRIP,
   DELETE_TRIP,
   EDIT_STEP,
-  DELETE_STEP,
   EDIT_TRIP_LINKS,
 } from '../actions/types';
 
