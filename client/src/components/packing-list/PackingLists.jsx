@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import { Outlet } from 'react-router-dom';
-import { connect, useDispatch } from 'react-redux';
+import { connect } from 'react-redux';
 
 import { getPackingLists } from '../../actions/packingLists';
 import axios from 'axios';
